@@ -2,6 +2,8 @@
 
 import { ipcMain, app } from "electron"
 import { AppState } from "./main"
+import fs from 'fs'
+import path from 'path'
 
 export function initializeIpcHandlers(appState: AppState): void {
   ipcMain.handle(
@@ -100,6 +102,35 @@ export function initializeIpcHandlers(appState: AppState): void {
     } catch (error: any) {
       console.error("Error in analyze-image-file handler:", error)
       throw error
+    }
+  })
+
+  // Gemini API Key config path
+  const configPath = path.join(app.getPath('userData'), 'config.json')
+
+  ipcMain.handle('get-gemini-api-key', async () => {
+    try {
+      if (fs.existsSync(configPath)) {
+        const config: Record<string, any> = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
+        return config.apiKey || ''
+      }
+      return ''
+    } catch (e) {
+      return ''
+    }
+  })
+
+  ipcMain.handle('set-gemini-api-key', async (event, key: string) => {
+    try {
+      let config: Record<string, any> = {}
+      if (fs.existsSync(configPath)) {
+        config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
+      }
+      config.apiKey = key
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 2))
+      return
+    } catch (e) {
+      throw e
     }
   })
 

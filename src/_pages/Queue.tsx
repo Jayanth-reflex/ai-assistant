@@ -11,7 +11,7 @@ import {
 import QueueCommands from "../components/Queue/QueueCommands"
 
 interface QueueProps {
-  setView: React.Dispatch<React.SetStateAction<"queue" | "solutions" | "debug">>
+  setView: React.Dispatch<React.SetStateAction<"queue" | "solutions" | "debug" | "settings">>
 }
 
 const Queue: React.FC<QueueProps> = ({ setView }) => {
@@ -98,6 +98,13 @@ const Queue: React.FC<QueueProps> = ({ setView }) => {
     const cleanupFunctions = [
       window.electronAPI.onScreenshotTaken(() => refetch()),
       window.electronAPI.onResetView(() => refetch()),
+      window.electronAPI.onSolutionStart(() => {
+        showToast(
+          "Processing",
+          "Processing your request...",
+          "neutral"
+        )
+      }),
       window.electronAPI.onSolutionError((error: string) => {
         showToast(
           "Processing Failed",
@@ -106,13 +113,6 @@ const Queue: React.FC<QueueProps> = ({ setView }) => {
         )
         setView("queue")
         console.error("Processing error:", error)
-      }),
-      window.electronAPI.onProcessingNoScreenshots(() => {
-        showToast(
-          "No Screenshots",
-          "There are no screenshots to process.",
-          "neutral"
-        )
       })
     ]
 
@@ -149,6 +149,7 @@ const Queue: React.FC<QueueProps> = ({ setView }) => {
           <QueueCommands
             screenshots={screenshots}
             onTooltipVisibilityChange={handleTooltipVisibilityChange}
+            setView={setView}
           />
         </div>
       </div>

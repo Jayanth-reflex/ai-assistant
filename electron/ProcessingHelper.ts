@@ -46,12 +46,23 @@ export class ProcessingHelper {
         this.appState.setView('solutions');
         try {
           const audioResult = await this.llmHelper.analyzeAudioFile(lastPath);
-          mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.PROBLEM_EXTRACTED, audioResult);
-          this.appState.setProblemInfo({ problem_statement: audioResult.text, input_format: {}, output_format: {}, constraints: [], test_cases: [] });
+          const problemInfo = {
+            problem_statement: audioResult.text,
+            input_format: { description: "Generated from audio input", parameters: [] },
+            output_format: { description: "Generated from audio input", type: "string", subtype: "voice" },
+            complexity: { time: "N/A", space: "N/A" },
+            test_cases: [],
+            validation_type: "manual",
+            difficulty: "custom"
+          };
+          mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.PROBLEM_EXTRACTED, problemInfo);
+          this.appState.setProblemInfo(problemInfo);
+          this.appState.clearQueues();
           return;
         } catch (err: any) {
           console.error('Audio processing error:', err);
           mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.INITIAL_SOLUTION_ERROR, err.message);
+          this.appState.clearQueues();
           return;
         }
       }

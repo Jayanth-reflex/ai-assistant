@@ -130,15 +130,11 @@ export const ComplexitySection = ({
 )
 
 interface SolutionsProps {
-  setView: React.Dispatch<React.SetStateAction<"queue" | "solutions" | "debug">>
+  setView: React.Dispatch<React.SetStateAction<"queue" | "solutions" | "debug" | "settings">>
 }
 const Solutions: React.FC<SolutionsProps> = ({ setView }) => {
   const queryClient = useQueryClient()
   const contentRef = useRef<HTMLDivElement>(null)
-
-  // Audio recording state
-  const [audioRecording, setAudioRecording] = useState(false)
-  const [audioResult, setAudioResult] = useState<AudioResult | null>(null)
 
   const [debugProcessing, setDebugProcessing] = useState(false)
   const [problemStatementData, setProblemStatementData] =
@@ -151,7 +147,6 @@ const Solutions: React.FC<SolutionsProps> = ({ setView }) => {
   const [spaceComplexityData, setSpaceComplexityData] = useState<string | null>(
     null
   )
-  const [customContent, setCustomContent] = useState<string | null>(null)
 
   const [toastOpen, setToastOpen] = useState(false)
   const [toastMessage, setToastMessage] = useState<ToastMessage>({
@@ -236,71 +231,41 @@ const Solutions: React.FC<SolutionsProps> = ({ setView }) => {
     const cleanupFunctions = [
       window.electronAPI.onScreenshotTaken(() => refetch()),
       window.electronAPI.onResetView(() => {
-        // Set resetting state first
         setIsResetting(true)
-
-        // Clear the queries
         queryClient.removeQueries(["solution"])
         queryClient.removeQueries(["new_solution"])
-
-        // Reset other states
-        refetch()
-
-        // After a small delay, clear the resetting state
-        setTimeout(() => {
-          setIsResetting(false)
-        }, 0)
-      }),
-      window.electronAPI.onSolutionStart(async () => {
-        // Reset UI state for a new solution
+        setProblemStatementData(null)
         setSolutionData(null)
         setThoughtsData(null)
         setTimeComplexityData(null)
         setSpaceComplexityData(null)
-        setCustomContent(null)
-        setAudioResult(null)
-
-        // Start audio recording from user's microphone
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-          const mediaRecorder = new MediaRecorder(stream)
-          const chunks: Blob[] = []
-          mediaRecorder.ondataavailable = (e) => chunks.push(e.data)
-          mediaRecorder.start()
-          setAudioRecording(true)
-          // Record for 5 seconds (or adjust as needed)
-          setTimeout(() => mediaRecorder.stop(), 5000)
-          mediaRecorder.onstop = async () => {
-            setAudioRecording(false)
-            const blob = new Blob(chunks, { type: chunks[0]?.type || 'audio/webm' })
-            const reader = new FileReader()
-            reader.onloadend = async () => {
-              const base64Data = (reader.result as string).split(',')[1]
-              // Send audio to Gemini for analysis
-              try {
-                const result = await window.electronAPI.analyzeAudioFromBase64(
-                  base64Data,
-                  blob.type
-                )
-                // Store result in react-query cache
-                queryClient.setQueryData(["audio_result"], result)
-                setAudioResult(result)
-              } catch (err) {
-                console.error('Audio analysis failed:', err)
-              }
-            }
-            reader.readAsDataURL(blob)
-          }
-        } catch (err) {
-          console.error('Audio recording error:', err)
-        }
-
-        // Simulate receiving custom content shortly after start
-        setTimeout(() => {
-          setCustomContent(
-            "This is the dynamically generated content appearing after loading starts."
-          )
-        }, 1500) // Example delay
+        setDebugProcessing(false)
+        refetch()
+        setTimeout(() => setIsResetting(false), 0)
+      }),
+      window.electronAPI.onSolutionStart(() => {
+        setSolutionData(null)
+        setThoughtsData(null)
+        setTimeComplexityData(null)
+        setSpaceComplexityData(null)
+        setProblemStatementData(null)
+        // No audio-specific state
+      }),
+      window.electronAPI.onProblemExtracted((data) => {
+        // Always parse into ProblemStatementData
+        setProblemStatementData({
+          problem_statement: data.text || data.problem_statement || "",
+          input_format: data.input_format || { description: "Generated from input", parameters: [] },
+          output_format: data.output_format || { description: "Generated from input", type: "string", subtype: data.audio ? "voice" : "text" },
+          complexity: data.complexity || { time: "N/A", space: "N/A" },
+          test_cases: data.test_cases || [],
+          validation_type: data.validation_type || "manual",
+          difficulty: data.difficulty || "custom"
+        })
+        setSolutionData(null)
+        setThoughtsData(null)
+        setTimeComplexityData(null)
+        setSpaceComplexityData(null)
       }),
       //if there was an error processing the initial solution
       window.electronAPI.onSolutionError((error: string) => {

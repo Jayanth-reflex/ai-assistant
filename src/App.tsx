@@ -4,6 +4,7 @@ import { ToastViewport } from "@radix-ui/react-toast"
 import { useEffect, useRef, useState } from "react"
 import Solutions from "./_pages/Solutions"
 import { QueryClient, QueryClientProvider } from "react-query"
+import Settings from "./_pages/Settings"
 
 declare global {
   interface Window {
@@ -60,7 +61,7 @@ const queryClient = new QueryClient({
 })
 
 const App: React.FC = () => {
-  const [view, setView] = useState<"queue" | "solutions" | "debug">("queue")
+  const [view, setView] = useState<"queue" | "solutions" | "debug" | "settings">("queue")
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Effect for height monitoring
@@ -160,6 +161,8 @@ const App: React.FC = () => {
             <Queue setView={setView} />
           ) : view === "solutions" ? (
             <Solutions setView={setView} />
+          ) : view === "settings" ? (
+            <Settings setView={setView} />
           ) : (
             <></>
           )}

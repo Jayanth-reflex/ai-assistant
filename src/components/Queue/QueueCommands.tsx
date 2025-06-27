@@ -1,21 +1,24 @@
 import React, { useState, useEffect, useRef } from "react"
 import { IoLogOutOutline } from "react-icons/io5"
+import { useQueryClient } from "react-query"
 
 interface QueueCommandsProps {
   onTooltipVisibilityChange: (visible: boolean, height: number) => void
   screenshots: Array<{ path: string; preview: string }>
+  setView?: React.Dispatch<React.SetStateAction<'queue' | 'solutions' | 'debug' | 'settings'>>
 }
 
 const QueueCommands: React.FC<QueueCommandsProps> = ({
   onTooltipVisibilityChange,
-  screenshots
+  screenshots,
+  setView
 }) => {
   const [isTooltipVisible, setIsTooltipVisible] = useState(false)
   const tooltipRef = useRef<HTMLDivElement>(null)
   const [isRecording, setIsRecording] = useState(false)
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
-  const [audioResult, setAudioResult] = useState<string | null>(null)
   const chunks = useRef<Blob[]>([])
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     let tooltipHeight = 0
@@ -35,7 +38,6 @@ const QueueCommands: React.FC<QueueCommandsProps> = ({
 
   const handleRecordClick = async () => {
     if (!isRecording) {
-      // Start recording
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
         const recorder = new MediaRecorder(stream)
@@ -43,26 +45,22 @@ const QueueCommands: React.FC<QueueCommandsProps> = ({
         recorder.onstop = async () => {
           const blob = new Blob(chunks.current, { type: chunks.current[0]?.type || 'audio/webm' })
           chunks.current = []
-          const reader = new FileReader()
-          reader.onloadend = async () => {
-            const base64Data = (reader.result as string).split(',')[1]
-            try {
-              const result = await window.electronAPI.analyzeAudioFromBase64(base64Data, blob.type)
-              setAudioResult(result.text)
-            } catch (err) {
-              setAudioResult('Audio analysis failed.')
-            }
-          }
-          reader.readAsDataURL(blob)
+          // Save audio file to disk via IPC
+          const arrayBuffer = await blob.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          const fileName = `audio_${Date.now()}.mp3`;
+          // Save to temp file and add to screenshot queue
+          const filePath = await window.electronAPI.saveTempFile(fileName, buffer);
+          // Refetch screenshots so the queue updates
+          queryClient.invalidateQueries(["screenshots"]);
         }
         setMediaRecorder(recorder)
         recorder.start()
         setIsRecording(true)
       } catch (err) {
-        setAudioResult('Could not start recording.')
+        // Optionally show error toast
       }
     } else {
-      // Stop recording
       mediaRecorder?.stop()
       setIsRecording(false)
       setMediaRecorder(null)
@@ -127,6 +125,15 @@ const QueueCommands: React.FC<QueueCommandsProps> = ({
             ) : (
               <span>🎤 Record Voice</span>
             )}
+          </button>
+          {/* Settings Button */}
+          <button
+            className="bg-white/10 hover:bg-white/20 transition-colors rounded-md px-2 py-1 text-[11px] leading-none text-white/70 flex items-center gap-1"
+            onClick={() => setView && setView('settings')}
+            type="button"
+            title="Settings"
+          >
+            <span role="img" aria-label="settings">⚙️</span> Settings
           </button>
         </div>
 
@@ -223,12 +230,6 @@ const QueueCommands: React.FC<QueueCommandsProps> = ({
           <IoLogOutOutline className="w-4 h-4" />
         </button>
       </div>
-      {/* Audio Result Display */}
-      {audioResult && (
-        <div className="mt-2 p-2 bg-white/10 rounded text-white text-xs max-w-md">
-          <span className="font-semibold">Audio Result:</span> {audioResult}
-        </div>
-      )}
     </div>
   )
 }

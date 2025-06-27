@@ -35,6 +35,8 @@ interface ElectronAPI {
   saveTempFile: (fileName: string, buffer: Buffer) => Promise<string>
   getCurrentSessionPath: () => Promise<string>
   listSessions: () => Promise<string[]>
+  getGeminiApiKey: () => Promise<string>
+  setGeminiApiKey: (key: string) => Promise<void>
 }
 
 export const PROCESSING_EVENTS = {
@@ -172,4 +174,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
   saveTempFile: (fileName: string, buffer: Buffer) => ipcRenderer.invoke('save-temp-file', fileName, buffer),
   getCurrentSessionPath: () => ipcRenderer.invoke('get-current-session-path'),
   listSessions: () => ipcRenderer.invoke('list-sessions'),
+  getGeminiApiKey: () => ipcRenderer.invoke('get-gemini-api-key'),
+  setGeminiApiKey: (key: string) => ipcRenderer.invoke('set-gemini-api-key', key),
 } as ElectronAPI)
