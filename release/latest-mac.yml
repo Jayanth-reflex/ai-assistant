@@ -1,0 +1,11 @@
+version: 1.0.0
+files:
+  - url: AI-Interview-Assistant-1.0.0-arm64-mac.zip
+    sha512: o0K/nPLZFwZfAVZa7jO35BgSt1DYMaoEcr7+lUQG+5yEyds/BdmiGzaNnwEJAUWjGBXjuPlI2jynwmE2l3Pqdw==
+    size: 153034235
+  - url: AI-Interview-Assistant-1.0.0-arm64.dmg
+    sha512: r6o1SFeGsB9W7037UkmzqvwilJXijsHLv8c6L4DuNQLQc58qHu8cyUb3kzYJ8wBzznSmUmrPdFiVcvqTXAW4qw==
+    size: 159148306
+path: AI-Interview-Assistant-1.0.0-arm64-mac.zip
+sha512: o0K/nPLZFwZfAVZa7jO35BgSt1DYMaoEcr7+lUQG+5yEyds/BdmiGzaNnwEJAUWjGBXjuPlI2jynwmE2l3Pqdw==
+releaseDate: '2025-06-26T23:28:34.673Z'

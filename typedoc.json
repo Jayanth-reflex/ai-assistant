@@ -1,0 +1,9 @@
+{
+  "entryPoints": ["src", "electron"],
+  "out": "docs/api",
+  "includeVersion": true,
+  "excludePrivate": true,
+  "excludeExternals": true,
+  "exclude": ["**/*.test.ts", "**/*.test.tsx", "**/node_modules/**"],
+  "tsconfig": "tsconfig.json"
+} 
