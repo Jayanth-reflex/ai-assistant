@@ -30,6 +30,7 @@ const Queue: React.FC<QueueProps> = ({ setView }) => {
 
   const [textInput, setTextInput] = useState("")
   const [showTextInput, setShowTextInput] = useState(false)
+  const [shouldRenderModal, setShouldRenderModal] = useState(false)
 
   const { data: screenshots = [], refetch } = useQuery<Array<{ path: string; preview: string; type?: 'image' | 'audio' | 'text' | 'unknown' }>, Error>(
     ["screenshots"],
@@ -176,67 +177,174 @@ const Queue: React.FC<QueueProps> = ({ setView }) => {
     setTooltipHeight(height)
   }
 
-  return (
-    <div ref={contentRef} className={`bg-transparent w-1/2`}>
-      <div className="px-4 py-3">
-        <Toast
-          open={toastOpen}
-          onOpenChange={setToastOpen}
-          variant={toastMessage.variant}
-          duration={3000}
-        >
-          <ToastTitle>{toastMessage.title}</ToastTitle>
-          <ToastDescription>{toastMessage.description}</ToastDescription>
-        </Toast>
+  // Handle clicking outside modal to close it
+  const handleModalBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      setShowTextInput(false)
+      setTextInput("")
+    }
+  }
 
-        {/* Text Input Modal/Popover */}
-        {showTextInput && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md flex flex-col gap-4">
-              <div className="text-base font-semibold text-gray-800">Type or paste a problem statement</div>
-              <input
-                className="flex-1 px-2 py-1 rounded border border-gray-300 text-sm"
-                type="text"
-                placeholder="Type or paste a problem statement..."
-                value={textInput}
-                onChange={(e) => setTextInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleAddText() }}
-                autoFocus
-              />
-              <div className="flex gap-2 justify-end">
-                <button
-                  className="px-3 py-1 rounded bg-gray-200 text-gray-700 text-xs hover:bg-gray-300"
-                  onClick={() => { setShowTextInput(false); setTextInput("") }}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="px-3 py-1 rounded bg-blue-600 text-white text-xs hover:bg-blue-700"
-                  onClick={handleAddText}
-                  disabled={!textInput.trim()}
-                >
-                  Add
-                </button>
-              </div>
+  // Handle escape key to close modal
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showTextInput) {
+        setShowTextInput(false)
+        setTextInput("")
+      }
+    }
+
+    if (showTextInput) {
+      document.addEventListener('keydown', handleEscape)
+      return () => document.removeEventListener('keydown', handleEscape)
+    }
+  }, [showTextInput])
+
+  // Handle modal rendering with a small delay
+  useEffect(() => {
+    if (showTextInput) {
+      const timer = setTimeout(() => {
+        setShouldRenderModal(true)
+      }, 50)
+      return () => {
+        clearTimeout(timer)
+        setShouldRenderModal(false)
+      }
+    } else {
+      setShouldRenderModal(false)
+    }
+  }, [showTextInput])
+
+  return (
+    <>
+      {/* Debug log */}
+      {console.log("Rendering Queue component, showTextInput:", showTextInput, "shouldRenderModal:", shouldRenderModal)}
+      
+      {/* Text Input Modal - Simple overlay approach */}
+      {showTextInput && shouldRenderModal && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 99999,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onClick={handleModalBackdropClick}
+        >
+          <div 
+            style={{
+              backgroundColor: '#1a1a1a',
+              border: '1px solid #333',
+              borderRadius: '8px',
+              padding: '15px',
+              width: '300px',
+              maxWidth: '90vw',
+              color: 'white'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <input
+              type="text"
+              style={{
+                width: '100%',
+                padding: '7px',
+                borderRadius: '4px',
+                border: '1px solid #555',
+                backgroundColor: '#2a2a2a',
+                color: 'white',
+                fontSize: '12px',
+                marginBottom: '10px',
+                outline: 'none',
+                height: '28px',
+                boxSizing: 'border-box'
+              }}
+              placeholder="Type or paste a problem statement..."
+              value={textInput}
+              onChange={(e) => setTextInput(e.target.value)}
+              onKeyDown={(e) => { 
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddText();
+                }
+              }}
+              autoFocus
+            />
+            <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+              <button
+                style={{
+                  padding: '4px 8px',
+                  borderRadius: '3px',
+                  border: 'none',
+                  backgroundColor: '#555',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: '10px',
+                  height: '24px',
+                  minWidth: '50px'
+                }}
+                onClick={() => { setShowTextInput(false); setTextInput("") }}
+              >
+                Cancel
+              </button>
+              <button
+                style={{
+                  padding: '4px 8px',
+                  borderRadius: '3px',
+                  border: 'none',
+                  backgroundColor: textInput.trim() ? '#007acc' : '#555',
+                  color: 'white',
+                  cursor: textInput.trim() ? 'pointer' : 'not-allowed',
+                  fontSize: '10px',
+                  height: '24px',
+                  minWidth: '40px'
+                }}
+                onClick={handleAddText}
+                disabled={!textInput.trim()}
+              >
+                Add
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        <div className="space-y-3 w-fit">
-          <ScreenshotQueue
-            isLoading={false}
-            screenshots={screenshots}
-            onDeleteScreenshot={handleDeleteScreenshot}
-          />
-          <QueueCommands
-            screenshots={screenshots}
-            onTooltipVisibilityChange={handleTooltipVisibilityChange}
-            setView={setView}
-            onShowTextInput={() => setShowTextInput(true)}
-          />
+      <div ref={contentRef} className={`bg-transparent w-1/2`}>
+        <div className="px-4 py-3">
+          <Toast
+            open={toastOpen}
+            onOpenChange={setToastOpen}
+            variant={toastMessage.variant}
+            duration={3000}
+          >
+            <ToastTitle>{toastMessage.title}</ToastTitle>
+            <ToastDescription>{toastMessage.description}</ToastDescription>
+          </Toast>
+
+          <div className="space-y-3 w-fit">
+            <ScreenshotQueue
+              isLoading={false}
+              screenshots={screenshots}
+              onDeleteScreenshot={handleDeleteScreenshot}
+            />
+            <QueueCommands
+              screenshots={screenshots}
+              onTooltipVisibilityChange={handleTooltipVisibilityChange}
+              setView={setView}
+              onShowTextInput={() => {
+                console.log("Text input button clicked, setting showTextInput to true");
+                setShowTextInput(true);
+              }}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

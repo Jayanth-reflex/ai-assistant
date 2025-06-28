@@ -50,7 +50,15 @@ const Settings: React.FC<SettingsProps> = ({ setView }) => {
   }
 
   return (
-    <div className="p-6 max-w-md mx-auto">
+    <div style={{
+      padding: '15px',
+      maxWidth: '300px',
+      margin: '0 auto',
+      backgroundColor: '#1a1a1a',
+      border: '1px solid #333',
+      borderRadius: '8px',
+      color: 'white'
+    }}>
       <Toast
         open={toastOpen}
         onOpenChange={setToastOpen}
@@ -61,23 +69,66 @@ const Settings: React.FC<SettingsProps> = ({ setView }) => {
         <ToastDescription>{toastMessage.description}</ToastDescription>
       </Toast>
       
-      <h2 className="text-xl font-bold mb-4">Settings</h2>
-      <label className="block mb-2 font-medium">Gemini API Key</label>
+      <div style={{ marginBottom: '10px', fontSize: '13px', fontWeight: 'bold' }}>
+        Settings
+      </div>
+      <div style={{ marginBottom: '8px', fontSize: '11px', color: '#ccc' }}>
+        Gemini API Key
+      </div>
       <input
-        className="w-full border rounded px-3 py-2 mb-4"
+        style={{
+          width: '100%',
+          padding: '7px',
+          borderRadius: '4px',
+          border: '1px solid #555',
+          backgroundColor: '#2a2a2a',
+          color: 'white',
+          fontSize: '12px',
+          marginBottom: '10px',
+          outline: 'none',
+          height: '28px',
+          boxSizing: 'border-box'
+        }}
         type="text"
         value={apiKey}
         onChange={e => setApiKey(e.target.value)}
         placeholder="Enter your Gemini API key"
       />
-      <button
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        onClick={handleSave}
-      >
-        Save
-      </button>
-      {status === "success" && <div className="text-green-600 mt-2">API key saved!</div>}
-      {status === "error" && <div className="text-red-600 mt-2">Failed to save API key.</div>}
+      <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+        <button
+          style={{
+            padding: '4px 8px',
+            borderRadius: '3px',
+            border: 'none',
+            backgroundColor: '#555',
+            color: 'white',
+            cursor: 'pointer',
+            fontSize: '10px',
+            height: '24px',
+            minWidth: '50px'
+          }}
+          onClick={() => setView("queue")}
+        >
+          Back
+        </button>
+        <button
+          style={{
+            padding: '4px 8px',
+            borderRadius: '3px',
+            border: 'none',
+            backgroundColor: apiKey.trim() ? '#007acc' : '#555',
+            color: 'white',
+            cursor: apiKey.trim() ? 'pointer' : 'not-allowed',
+            fontSize: '10px',
+            height: '24px',
+            minWidth: '40px'
+          }}
+          onClick={handleSave}
+          disabled={!apiKey.trim()}
+        >
+          Save
+        </button>
+      </div>
     </div>
   )
 }

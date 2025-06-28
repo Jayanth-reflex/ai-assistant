@@ -96,8 +96,12 @@ const ScrollableContent: React.FC<ScrollableContentProps> = ({
     <div className={`relative ${className}`}>
       <div
         ref={containerRef}
-        className="overflow-y-auto"
-        style={{ maxHeight }}
+        className="overflow-y-auto scrollbar-hide"
+        style={{ 
+          maxHeight,
+          scrollbarWidth: 'none', /* Firefox */
+          msOverflowStyle: 'none', /* Internet Explorer 10+ */
+        }}
         onScroll={checkScrollPosition}
       >
         {children}

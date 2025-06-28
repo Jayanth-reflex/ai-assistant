@@ -47,23 +47,32 @@ export class ProcessingHelper {
 
   public async processScreenshots(inputQueue?: Array<{ type: 'screenshot' | 'audio' | 'text', value: string }>): Promise<void> {
     const mainWindow = this.appState.getMainWindow()
-    if (!mainWindow) return
+    if (!mainWindow) {
+      console.error('Main window not available for processing')
+      return
+    }
 
     const view = this.appState.getView()
 
     // If inputQueue is provided, use it; otherwise, fall back to screenshot queue
     let queue = inputQueue
     if (!queue) {
-      const screenshotQueue = this.appState.getScreenshotHelper().getScreenshotQueue()
-      queue = screenshotQueue.map((path) => {
-        if (path.endsWith('.mp3') || path.endsWith('.wav')) {
-          return { type: 'audio' as const, value: path }
-        } else if (path.endsWith('.txt')) {
-          return { type: 'text' as const, value: path }
-        } else {
-          return { type: 'screenshot' as const, value: path }
-        }
-      })
+      try {
+        const screenshotQueue = this.appState.getScreenshotHelper().getScreenshotQueue()
+        queue = screenshotQueue.map((path) => {
+          if (path.endsWith('.mp3') || path.endsWith('.wav')) {
+            return { type: 'audio' as const, value: path }
+          } else if (path.endsWith('.txt')) {
+            return { type: 'text' as const, value: path }
+          } else {
+            return { type: 'screenshot' as const, value: path }
+          }
+        })
+      } catch (error) {
+        console.error('Error preparing queue:', error)
+        mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.INITIAL_SOLUTION_ERROR, 'Failed to prepare processing queue')
+        return
+      }
     }
 
     if (view === "queue") {
@@ -77,24 +86,51 @@ export class ProcessingHelper {
 
       let combinedText = ''
       let inputTypes: Array<'screenshot' | 'audio' | 'text'> = []
+      let processingErrors: string[] = []
+      
       try {
-        for (const item of queue) {
-          inputTypes.push(item.type)
-          if (item.type === 'screenshot') {
-            const llmHelper = await this.getLLMHelper()
-            const imageResult = await llmHelper.analyzeImageFile(item.value)
-            combinedText += imageResult.text + '\n'
-          } else if (item.type === 'audio') {
-            const llmHelper = await this.getLLMHelper()
-            const audioResult = await llmHelper.analyzeAudioFile(item.value)
-            combinedText += audioResult.text + '\n'
-          } else if (item.type === 'text') {
-            const textContent = await this.readTextFile(item.value)
-            const llmHelper = await this.getLLMHelper()
-            const textResult = await llmHelper.analyzeTextInput(textContent)
-            combinedText += textResult.text + '\n'
+        // Process items in parallel for better performance
+        const llmHelper = await this.getLLMHelper()
+        
+        const processingPromises = queue.map(async (item, index) => {
+          try {
+            inputTypes.push(item.type)
+            console.log(`Processing item ${index + 1}/${queue.length}: ${item.type}`)
+            
+            if (item.type === 'screenshot') {
+              const imageResult = await llmHelper.analyzeImageFile(item.value)
+              return imageResult.text
+            } else if (item.type === 'audio') {
+              const audioResult = await llmHelper.analyzeAudioFile(item.value)
+              return audioResult.text
+            } else if (item.type === 'text') {
+              const textContent = await this.readTextFile(item.value)
+              const textResult = await llmHelper.analyzeTextInput(textContent)
+              return textResult.text
+            }
+            return ''
+          } catch (error) {
+            const errorMsg = `Failed to process ${item.type} item: ${error instanceof Error ? error.message : 'Unknown error'}`
+            console.error(errorMsg)
+            processingErrors.push(errorMsg)
+            return `[Processing Error: ${errorMsg}]`
           }
+        })
+        
+        // Wait for all processing to complete
+        const results = await Promise.all(processingPromises)
+        combinedText = results.join('\n')
+        
+        // Check if we have any meaningful content
+        if (!combinedText || combinedText.trim().length === 0) {
+          throw new Error('No content could be extracted from any input items')
         }
+        
+        // If we had processing errors, add them to the combined text
+        if (processingErrors.length > 0) {
+          combinedText += '\n\nProcessing Notes:\n' + processingErrors.join('\n')
+        }
+        
         const problemInfo = {
           problem_statement: combinedText.trim(),
           input_types: inputTypes,
@@ -103,41 +139,51 @@ export class ProcessingHelper {
           complexity: { time: "N/A", space: "N/A" },
           test_cases: [] as any[],
           validation_type: "manual",
-          difficulty: "custom"
+          difficulty: "custom",
+          processing_errors: processingErrors.length > 0 ? processingErrors : undefined
         }
+        
         mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.PROBLEM_EXTRACTED, problemInfo)
         this.appState.setProblemInfo(problemInfo)
         this.appState.clearQueues()
+        
+        if (processingErrors.length > 0) {
+          console.warn(`Processing completed with ${processingErrors.length} errors`)
+        } else {
+          console.log('Processing completed successfully')
+        }
+        
         return
       } catch (err: any) {
         console.error('Processing error:', err)
-        mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.INITIAL_SOLUTION_ERROR, err.message)
+        const errorMessage = err.message || 'Unknown processing error occurred'
+        mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.INITIAL_SOLUTION_ERROR, errorMessage)
         this.appState.clearQueues()
         return
       }
     } else {
       // Debug mode
-      const extraScreenshotQueue = this.appState.getScreenshotHelper().getExtraScreenshotQueue()
-      if (extraScreenshotQueue.length === 0) {
-        console.log("No extra screenshots to process")
-        mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.NO_SCREENSHOTS)
-        return
-      }
-
-      mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.DEBUG_START)
-      this.currentExtraProcessingAbortController = new AbortController()
-
       try {
+        const extraScreenshotQueue = this.appState.getScreenshotHelper().getExtraScreenshotQueue()
+        if (extraScreenshotQueue.length === 0) {
+          console.log("No extra screenshots to process")
+          mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.NO_SCREENSHOTS)
+          return
+        }
+
+        mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.DEBUG_START)
+        this.currentExtraProcessingAbortController = new AbortController()
+
         // Get problem info and current solution
         const problemInfo = this.appState.getProblemInfo()
         if (!problemInfo) {
-          throw new Error("No problem info available")
+          throw new Error("No problem info available for debugging")
         }
 
         // Get current solution from state
         const llmHelper = await this.getLLMHelper()
         const currentSolution = await llmHelper.generateSolution(problemInfo)
-        const currentCode = currentSolution.text // Now returns {text, timestamp}
+        const currentCode = currentSolution.text
 
         // Debug the solution using vision model
         const debugResult = await llmHelper.debugSolutionWithImages(
@@ -154,9 +200,10 @@ export class ProcessingHelper {
 
       } catch (error: any) {
         console.error("Debug processing error:", error)
+        const errorMessage = error.message || 'Unknown debug processing error'
         mainWindow.webContents.send(
           this.appState.PROCESSING_EVENTS.DEBUG_ERROR,
-          error.message
+          errorMessage
         )
       } finally {
         this.currentExtraProcessingAbortController = null

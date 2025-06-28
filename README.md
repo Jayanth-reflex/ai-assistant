@@ -124,4 +124,4 @@ For support and questions:
 ### 🛠️ Troubleshooting
 
 - **Gemini API key not found**: If you see an error about the Gemini API key, open the app Settings and paste your API key. The app cannot process screenshots, audio, or text without it.
-- **Text input is not generating an AI response**: Ensure you are running the latest version and have set your Gemini API key in the Settings.
+- **Text input is not generating an AI response**: Make sure you are running the latest version and have set your Gemini API key in Settings.

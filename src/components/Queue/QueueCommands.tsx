@@ -83,23 +83,22 @@ const QueueCommands: React.FC<QueueCommandsProps> = ({
           clearTimeout(recordingTimeout)
           console.log("Recording stopped, processing audio...")
           try {
-            const blob = new Blob(chunks.current, { type: chunks.current[0]?.type || 'audio/webm' })
-            chunks.current = []
-            const arrayBuffer = await blob.arrayBuffer();
-            const uint8Array = new Uint8Array(arrayBuffer);
-            const fileName = `audio_${Date.now()}.mp3`;
-            console.log("Saving audio file:", fileName)
+          const blob = new Blob(chunks.current, { type: chunks.current[0]?.type || 'audio/webm' })
+          chunks.current = []
+          const arrayBuffer = await blob.arrayBuffer();
+          const uint8Array = new Uint8Array(arrayBuffer);
+          const fileName = `audio_${Date.now()}.mp3`;
+          console.log("Saving audio file:", fileName)
             
-            // Send Uint8Array directly
-            const tempPath = await (window.electronAPI as any).saveTempFile(fileName, uint8Array);
-            console.log("Audio file saved to temp path:", tempPath)
-            console.log("Adding audio file to queue...")
+          // Send Uint8Array directly
+          const tempPath = await (window.electronAPI as any).saveTempFile(fileName, uint8Array);
+          console.log("Audio file saved to temp path:", tempPath)
+          console.log("Adding audio file to queue...")
             
             const result = await (window.electronAPI as any).addFileToQueue(tempPath);
             if (result.success) {
-              console.log("Audio file added to queue successfully")
-              queryClient.invalidateQueries(["screenshots"]);
-              showToast("Audio File Added", "The audio file has been successfully added to the queue.")
+          console.log("Audio file added to queue successfully")
+          queryClient.invalidateQueries(["screenshots"]);
             } else {
               console.error("Failed to add audio file to queue:", result.error)
               showToast("Audio File Addition Error", result.error, 'error')
@@ -128,7 +127,6 @@ const QueueCommands: React.FC<QueueCommandsProps> = ({
         setMediaRecorder(recorder)
         recorder.start()
         setIsRecording(true)
-        showToast("Recording Started", "Voice recording is now active. Click the button again to stop.", 'success')
       } catch (err) {
         console.error("Error starting recording:", err)
         // Show user-friendly error message
@@ -137,9 +135,8 @@ const QueueCommands: React.FC<QueueCommandsProps> = ({
     } else {
       if (mediaRecorder) {
         mediaRecorder.stop()
-        setIsRecording(false)
-        setMediaRecorder(null)
-        showToast("Recording Stopped", "Processing your audio recording...", 'neutral')
+      setIsRecording(false)
+      setMediaRecorder(null)
       }
     }
   }
