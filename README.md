@@ -80,8 +80,11 @@ npm run app:dev
 ### 4. **Using the App**
 - **Take a Screenshot**: Use the shortcut (Cmd+H) to capture a problem statement or code.
 - **Record Voice**: Click the microphone button to record a spoken question or answer.
-- **Process (Cmd+Enter)**: Processes the current input (screenshot or voice) and generates an AI-powered response.
+- **Text Input (AI-Processed)**: Click the text input button, enter your question or problem, and add it to the queue. The AI will analyze your text and generate a structured response (not just echo your input).
+- **Process (Cmd+Enter)**: Processes the current input (screenshot, voice, or text) and generates an AI-powered response.
 - **Reset (Cmd+R)**: Clears the current session and returns to the home view.
+
+> **Note:** Screenshots and audio are processed as before. Only text input behavior has changed: it is now analyzed by the AI, not just displayed as-is.
 
 ## 🧑‍💻 Contributing
 - Fork the repo and create a feature branch
@@ -117,3 +120,8 @@ For support and questions:
 - Open an issue for bugs or feature requests
 
 ---
+
+### 🛠️ Troubleshooting
+
+- **Gemini API key not found**: If you see an error about the Gemini API key, open the app Settings and paste your API key. The app cannot process screenshots, audio, or text without it.
+- **Text input is not generating an AI response**: Ensure you are running the latest version and have set your Gemini API key in the Settings.
