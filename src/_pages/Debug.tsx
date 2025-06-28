@@ -14,6 +14,7 @@ import {
 } from "../components/ui/toast"
 import ExtraScreenshotsQueueHelper from "../components/Solutions/SolutionCommands"
 import { diffLines } from "diff"
+import { preferencesManager } from "../lib/preferences"
 
 type DiffLine = {
   value: string
@@ -208,22 +209,19 @@ const Debug: React.FC<DebugProps> = ({ isProcessing, setIsProcessing }) => {
   const [oldCode, setOldCode] = useState<string | null>(null)
   const [newCode, setNewCode] = useState<string | null>(null)
   const [thoughtsData, setThoughtsData] = useState<string[] | null>(null)
-  const [timeComplexityData, setTimeComplexityData] = useState<string | null>(
-    null
-  )
-  const [spaceComplexityData, setSpaceComplexityData] = useState<string | null>(
-    null
-  )
-
+  const [timeComplexityData, setTimeComplexityData] = useState<string | null>(null)
+  const [spaceComplexityData, setSpaceComplexityData] = useState<string | null>(null)
   const [toastOpen, setToastOpen] = useState(false)
   const [toastMessage, setToastMessage] = useState<ToastMessage>({
     title: "",
     description: "",
     variant: "neutral"
   })
-
   const [isTooltipVisible, setIsTooltipVisible] = useState(false)
   const [tooltipHeight, setTooltipHeight] = useState(0)
+  
+  // Get current preferences
+  const [preferences, setPreferences] = useState(preferencesManager.getPreferences())
 
   const { data: extraScreenshots = [], refetch } = useQuery({
     queryKey: ["extras"],
@@ -335,28 +333,49 @@ const Debug: React.FC<DebugProps> = ({ isProcessing, setIsProcessing }) => {
     }
   }, [queryClient])
 
+  // Update preferences when they change
   useEffect(() => {
-    if (window.electron && window.electron.ipcRenderer) {
-      window.electron.ipcRenderer.on('hotkey-screenshot-ocr', () => {
-        // TODO: Trigger screenshot + OCR logic
-        console.log('Hotkey: Screenshot + OCR triggered');
-        // Optionally show a toast
-      });
-      window.electron.ipcRenderer.on('hotkey-ai-process', () => {
-        // TODO: Trigger AI processing/output logic
-        console.log('Hotkey: AI processing triggered');
-        // Optionally show a toast
-      });
-      return () => {
-        window.electron.ipcRenderer.removeAllListeners('hotkey-screenshot-ocr');
-        window.electron.ipcRenderer.removeAllListeners('hotkey-ai-process');
-      };
+    const interval = setInterval(() => {
+      const currentPrefs = preferencesManager.getPreferences()
+      if (JSON.stringify(currentPrefs) !== JSON.stringify(preferences)) {
+        setPreferences(currentPrefs)
+      }
+    }, 1000) // Check every second for preference changes
+
+    return () => clearInterval(interval)
+  }, [preferences])
+
+  useEffect(() => {
+    if (window.electronAPI) {
+      // TODO: Trigger screenshot + OCR logic
+      console.log('Hotkey: Screenshot + OCR triggered');
+      // Optionally show a toast
+    }
+    if (window.electronAPI) {
+      // TODO: Trigger AI processing/output logic
+      console.log('Hotkey: AI processing triggered');
+      // Optionally show a toast
     }
   }, []);
 
   const handleTooltipVisibilityChange = (visible: boolean, height: number) => {
     setIsTooltipVisible(visible)
     setTooltipHeight(height)
+  }
+
+  // Get dynamic styles based on preferences
+  const getResponseStyles = () => {
+    const bgStyle = preferencesManager.getResponseBackgroundStyle()
+    const fontColor = preferencesManager.getResponseFontColor()
+    
+    // Debug logging
+    console.log('Debug - Background style:', bgStyle)
+    console.log('Debug - Font color:', fontColor)
+    
+    return {
+      backgroundColor: bgStyle,
+      color: fontColor
+    }
   }
 
   return (
@@ -391,7 +410,10 @@ const Debug: React.FC<DebugProps> = ({ isProcessing, setIsProcessing }) => {
       />
 
       {/* Main Content */}
-      <div className="w-full text-sm text-black bg-black/60 rounded-md">
+      <div 
+        className="w-full text-sm rounded-md"
+        style={getResponseStyles()}
+      >
         <div className="rounded-lg overflow-hidden">
           <div className="px-4 py-3 space-y-4">
             {/* Thoughts Section */}
@@ -404,7 +426,7 @@ const Debug: React.FC<DebugProps> = ({ isProcessing, setIsProcessing }) => {
                       {thoughtsData.map((thought, index) => (
                         <div key={index} className="flex items-start gap-2">
                           <div className="w-1 h-1 rounded-full bg-blue-400/80 mt-2 shrink-0" />
-                          <div>{thought}</div>
+                          <div style={{ color: preferences.responseFontColor }}>{thought}</div>
                         </div>
                       ))}
                     </div>
@@ -412,6 +434,7 @@ const Debug: React.FC<DebugProps> = ({ isProcessing, setIsProcessing }) => {
                 )
               }
               isLoading={!thoughtsData}
+              fontColor={preferences.responseFontColor}
             />
 
             {/* Code Comparison Section */}
@@ -426,6 +449,7 @@ const Debug: React.FC<DebugProps> = ({ isProcessing, setIsProcessing }) => {
               timeComplexity={timeComplexityData}
               spaceComplexity={spaceComplexityData}
               isLoading={!timeComplexityData || !spaceComplexityData}
+              fontColor={preferences.responseFontColor}
             />
           </div>
         </div>

@@ -17,20 +17,23 @@ import { AudioResult } from "../types/audio"
 import SolutionCommands from "../components/Solutions/SolutionCommands"
 import ScrollableContent from "../components/ScrollableContent/ScrollableContent"
 import Debug from "./Debug"
+import { preferencesManager } from "../lib/preferences"
 
 // (Using global ElectronAPI type from src/types/electron.d.ts)
 
 export const ContentSection = ({
   title,
   content,
-  isLoading
+  isLoading,
+  fontColor
 }: {
   title: string
   content: React.ReactNode
   isLoading: boolean
+  fontColor?: string
 }) => (
   <div className="space-y-2">
-    <h2 className="text-[13px] font-medium text-white tracking-wide">
+    <h2 className="text-[13px] font-medium text-white tracking-wide" style={fontColor ? { color: fontColor } : undefined}>
       {title}
     </h2>
     {isLoading ? (
@@ -41,7 +44,7 @@ export const ContentSection = ({
       </div>
     ) : (
       <ScrollableContent maxHeight="400px">
-        <div className="text-[13px] leading-[1.4] text-gray-100 max-w-[600px]">
+        <div className="text-[13px] leading-[1.4] text-gray-100 max-w-[600px]" style={fontColor ? { color: fontColor } : undefined}>
           {content}
         </div>
       </ScrollableContent>
@@ -96,14 +99,16 @@ const SolutionSection = ({
 export const ComplexitySection = ({
   timeComplexity,
   spaceComplexity,
-  isLoading
+  isLoading,
+  fontColor
 }: {
   timeComplexity: string | null
   spaceComplexity: string | null
   isLoading: boolean
+  fontColor?: string
 }) => (
   <div className="space-y-2">
-    <h2 className="text-[13px] font-medium text-white tracking-wide">
+    <h2 className="text-[13px] font-medium text-white tracking-wide" style={fontColor ? { color: fontColor } : undefined}>
       Complexity (Updated)
     </h2>
     {isLoading ? (
@@ -112,13 +117,13 @@ export const ComplexitySection = ({
       </p>
     ) : (
       <div className="space-y-1">
-        <div className="flex items-start gap-2 text-[13px] leading-[1.4] text-gray-100">
+        <div className="flex items-start gap-2 text-[13px] leading-[1.4] text-gray-100" style={fontColor ? { color: fontColor } : undefined}>
           <div className="w-1 h-1 rounded-full bg-blue-400/80 mt-2 shrink-0" />
           <div>
             <strong>Time:</strong> {timeComplexity}
           </div>
         </div>
-        <div className="flex items-start gap-2 text-[13px] leading-[1.4] text-gray-100">
+        <div className="flex items-start gap-2 text-[13px] leading-[1.4] text-gray-100" style={fontColor ? { color: fontColor } : undefined}>
           <div className="w-1 h-1 rounded-full bg-blue-400/80 mt-2 shrink-0" />
           <div>
             <strong>Space:</strong> {spaceComplexity}
@@ -145,6 +150,9 @@ const Solutions: React.FC<SolutionsProps> = ({ setView }) => {
     variant: "neutral"
   })
   const [isResetting, setIsResetting] = useState(false)
+  
+  // Get current preferences
+  const [preferences, setPreferences] = useState(preferencesManager.getPreferences())
 
   const { data: extraScreenshots = [], refetch } = useQuery<Array<{ path: string; preview: string }>, Error>(
     ["extras"],
@@ -177,11 +185,38 @@ const Solutions: React.FC<SolutionsProps> = ({ setView }) => {
     return () => cleanupFunctions.forEach((cleanup) => cleanup())
   }, [])
 
+  // Update preferences when they change
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentPrefs = preferencesManager.getPreferences()
+      if (JSON.stringify(currentPrefs) !== JSON.stringify(preferences)) {
+        setPreferences(currentPrefs)
+      }
+    }, 1000) // Check every second for preference changes
+
+    return () => clearInterval(interval)
+  }, [preferences])
+
   const handleCopy = () => {
     if (problemInfo?.problem_statement) {
       navigator.clipboard.writeText(problemInfo.problem_statement)
       setToastMessage({ title: "Copied!", description: "Response copied to clipboard.", variant: "neutral" })
       setToastOpen(true)
+    }
+  }
+
+  // Get dynamic styles based on preferences
+  const getResponseStyles = () => {
+    const bgStyle = preferencesManager.getResponseBackgroundStyle()
+    const fontColor = preferencesManager.getResponseFontColor()
+    
+    // Debug logging
+    console.log('Solutions - Background style:', bgStyle)
+    console.log('Solutions - Font color:', fontColor)
+    
+    return {
+      backgroundColor: bgStyle,
+      color: fontColor
     }
   }
 
@@ -197,7 +232,10 @@ const Solutions: React.FC<SolutionsProps> = ({ setView }) => {
         <ToastDescription>{toastMessage.description}</ToastDescription>
       </Toast>
       {!isResetting && problemInfo && (
-        <div className="w-full max-w-2xl mx-auto bg-black/70 rounded-lg shadow-lg p-4 relative">
+        <div 
+          className="w-full max-w-2xl mx-auto rounded-lg shadow-lg p-4 relative"
+          style={getResponseStyles()}
+        >
           {/* Input tags */}
           <div className="flex gap-2 mb-2">
             {problemInfo.input_types?.includes('screenshot') && (
@@ -212,7 +250,8 @@ const Solutions: React.FC<SolutionsProps> = ({ setView }) => {
           </div>
           {/* Copy button */}
           <button
-            className="absolute top-4 right-4 px-2 py-1 text-xs bg-white/10 hover:bg-white/20 rounded text-white"
+            className="absolute top-4 right-4 px-2 py-1 text-xs bg-white/10 hover:bg-white/20 rounded"
+            style={{ color: preferences.responseFontColor }}
             onClick={handleCopy}
             title="Copy response"
           >
@@ -222,7 +261,10 @@ const Solutions: React.FC<SolutionsProps> = ({ setView }) => {
           <ScrollableContent maxHeight="500px">
             <div className="rounded-lg overflow-hidden">
               <div className="px-2 py-2 space-y-4 max-w-full">
-                <div className="text-[13px] leading-[1.4] text-gray-100 max-w-[600px] whitespace-pre-wrap">
+                <div 
+                  className="text-[13px] leading-[1.4] max-w-[600px] whitespace-pre-wrap"
+                  style={{ color: preferences.responseFontColor }}
+                >
                   {problemInfo.problem_statement}
                 </div>
               </div>
