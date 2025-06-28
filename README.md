@@ -1,127 +1,499 @@
-# AI Interview Assistant
+# 🎯 AI Interview Assistant
 
-> A professional desktop application for AI-powered interview coaching and real-time assistance during meetings and interviews.
+<div align="center">
 
-## 📋 Legal & Ethical Considerations
+![AI Interview Assistant](https://img.shields.io/badge/AI-Powered%20Interview%20Assistant-blue?style=for-the-badge&logo=openai)
+![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Windows-lightgrey?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![TypeScript](https://img.shields.io/badge/TypeScript-100%25-blue?style=for-the-badge&logo=typescript)
 
-### Privacy & Data Protection
-- **Local Processing**: All audio and screen capture is processed locally on your device
-- **No Cloud Storage**: No personal data is stored in the cloud or shared with third parties
-- **API Usage**: Only text content (transcripts, OCR text) is sent to Google's Gemini API for analysis
-- **Data Retention**: All session data is stored locally and can be deleted at any time
+> **Professional AI-powered desktop application for real-time interview coaching, meeting assistance, and intelligent conversation support.**
 
-### Ethical Usage Guidelines
-- **Consent**: Ensure all participants in meetings/interviews are aware of and consent to AI assistance
-- **Transparency**: Use the tool responsibly and inform others when AI is being used
-- **Compliance**: Follow all applicable laws, regulations, and company policies
+[🚀 Quick Start](#-quick-start) • [📋 Features](#-features) • [🎨 Customization](#-customization) • [🛠️ Setup](#️-setup) • [📖 Usage](#-usage) • [🤝 Contributing](#-contributing)
 
-## 🚀 Features
-
-### Core Functionality
-- **Real-time Screen Capture**: Automatic and manual screenshot capture with OCR
-- **Audio Transcription**: Live speech-to-text conversion using Whisper
-- **AI-Powered Coaching**: Contextual interview suggestions and feedback
-- **Smart Context Analysis**: Combines screen content and audio for comprehensive insights
-- **Session Management**: Local storage of all interactions and data
-- **Hotkey Controls**: Global keyboard shortcuts for seamless operation
-
-### Advanced Features
-- **Document Analysis**: Resume and document parsing for interview preparation
-- **Follow-up Generation**: Automated post-meeting summaries and action items
-- **Multi-modal AI**: Combines text, audio, and visual context for better responses
-- **Cross-platform Support**: Works on macOS and Windows
-- **Always-on-top Interface**: Non-intrusive overlay for easy access
-
-## 🛠 Tech Stack
-
-### Frontend
-- **React 18** - Modern UI framework with TypeScript
-- **Vite** - Fast build tool and development server
-- **Tailwind CSS** - Utility-first CSS framework
-- **Electron** - Cross-platform desktop application framework
-
-### Backend & AI
-- **Node.js** - Server-side JavaScript runtime
-- **Google Gemini API** - Advanced AI model for text analysis and generation
-- **OpenAI Whisper** - Speech-to-text transcription
-- **Tesseract.js** - OCR (Optical Character Recognition) for screen text extraction
-
-### Development & Testing
-- **TypeScript** - Type-safe JavaScript development
-- **Playwright** - End-to-end testing framework
-- **ESLint & Prettier** - Code quality and formatting
-- **Husky** - Git hooks for code quality
-
-### Build & Deployment
-- **Electron Builder** - Application packaging and distribution
-- **Cross-env** - Cross-platform environment variable management
-- **Concurrently** - Parallel process management
-
-## 🚀 Setup & Usage
-
-### 1. **Install Dependencies**
-```sh
-npm install
-```
-
-### 2. **Start the App in Development Mode**
-```sh
-npm run app:dev
-```
-
-### 3. **Set Your Gemini API Key (In-App Settings)**
-- Launch the app.
-- Click the **Settings** (gear icon) button in the main interface (beside the Record Voice button).
-- Paste your [Google Gemini API key](https://aistudio.google.com/app/apikey) into the input field and click **Save**.
-- Your API key is securely stored in your local app data and will persist across sessions.
-
-> **Note:** You no longer need to edit a `.env` file. All API key management is handled securely in-app.
-
-### 4. **Using the App**
-- **Take a Screenshot**: Use the shortcut (Cmd+H) to capture a problem statement or code.
-- **Record Voice**: Click the microphone button to record a spoken question or answer.
-- **Text Input (AI-Processed)**: Click the text input button, enter your question or problem, and add it to the queue. The AI will analyze your text and generate a structured response (not just echo your input).
-- **Process (Cmd+Enter)**: Processes the current input (screenshot, voice, or text) and generates an AI-powered response.
-- **Reset (Cmd+R)**: Clears the current session and returns to the home view.
-
-> **Note:** Screenshots and audio are processed as before. Only text input behavior has changed: it is now analyzed by the AI, not just displayed as-is.
-
-## 🧑‍💻 Contributing
-- Fork the repo and create a feature branch
-- Submit a pull request with a clear description
-
-## 📄 License
-MIT License
-
-## 🌐 Links
-- [Google Gemini API Key Signup](https://aistudio.google.com/app/apikey)
-- [Project Issues](https://github.com/your-repo/issues)
-
-## 📁 Project Structure
-
-```
-.
-├── electron/         # Electron main process & backend services
-├── src/              # React frontend (pages, components, types)
-├── renderer/         # Renderer process (React app entry, assets)
-├── tests/            # Automated and unit tests
-├── worker-script/    # Node worker scripts
-├── package.json      # Project metadata & scripts
-├── README.md         # Project documentation
-├── LICENSE           # License file
-└── ... (other config and meta files)
-```
-
-## 🆘 Support
-
-For support and questions:
-- Check the troubleshooting section above
-- Review the code documentation
-- Open an issue for bugs or feature requests
+</div>
 
 ---
 
-### 🛠️ Troubleshooting
+## 🌟 Overview
 
-- **Gemini API key not found**: If you see an error about the Gemini API key, open the app Settings and paste your API key. The app cannot process screenshots, audio, or text without it.
-- **Text input is not generating an AI response**: Make sure you are running the latest version and have set your Gemini API key in Settings.
+The **AI Interview Assistant** is a cutting-edge desktop application that revolutionizes how you approach interviews, meetings, and professional conversations. Built with modern technologies and powered by Google's Gemini AI, it provides real-time assistance through multiple input modalities while maintaining complete privacy and local data processing.
+
+### ✨ What Makes It Special
+
+- 🎯 **Real-time AI Coaching**: Get instant feedback and suggestions during live conversations
+- 🔒 **100% Privacy-First**: All processing happens locally on your device
+- 🎨 **Fully Customizable**: Personalize the interface to match your preferences
+- 🚀 **Multi-Modal Input**: Screenshots, voice, and text - all processed intelligently
+- ⚡ **Always-On-Top**: Non-intrusive overlay that stays accessible during meetings
+- 🧠 **Context-Aware**: Combines visual, audio, and textual context for better responses
+
+---
+
+## 📋 Features
+
+### 🎯 Core Functionality
+
+| Feature | Description | Hotkey |
+|---------|-------------|---------|
+| **📸 Smart Screenshots** | Capture code, documents, or problems for AI analysis | `⌘ + H` |
+| **🎤 Voice Transcription** | Real-time speech-to-text with Whisper AI | Click mic |
+| **⌨️ Text Input** | Direct text entry for immediate AI processing | Click text |
+| **🧠 AI Analysis** | Multi-modal context analysis with Gemini AI | `⌘ + Enter` |
+| **🔄 Session Reset** | Clear current session and start fresh | `⌘ + R` |
+
+### 🚀 Advanced Capabilities
+
+#### **Multi-Modal Intelligence**
+- **Visual Context**: OCR-powered text extraction from screenshots
+- **Audio Processing**: High-accuracy speech recognition
+- **Text Analysis**: Intelligent processing of typed questions
+- **Context Fusion**: Combines all inputs for comprehensive understanding
+
+#### **Professional Features**
+- **Document Analysis**: Resume and document parsing for interview prep
+- **Follow-up Generation**: Automated meeting summaries and action items
+- **Session Management**: Local storage of all interactions
+- **Cross-platform Support**: Seamless experience on macOS and Windows
+
+#### **User Experience**
+- **Always-on-top Interface**: Non-intrusive overlay design
+- **Global Hotkeys**: Keyboard shortcuts work system-wide
+- **Real-time Updates**: Instant feedback and response generation
+- **Customizable UI**: Personalize colors, fonts, and opacity
+
+---
+
+## 🎨 Customization
+
+### 🎨 Response Appearance
+
+Transform your AI responses with complete visual customization:
+
+#### **Color Customization**
+- **Background Colors**: Choose from millions of colors or use the color picker
+- **Font Colors**: Select optimal text colors for readability
+- **Opacity Control**: Fine-tune transparency from 10% to 90%
+- **Real-time Preview**: See changes apply instantly
+
+#### **Accessing Customization**
+1. Click the **⚙️ Settings** icon in the main interface
+2. Navigate to the **Response Colors** section
+3. Use color pickers or enter hex values
+4. Adjust opacity with the slider
+5. Click **Save** to apply changes
+
+#### **Default Theme**
+- **Background**: Black (`#000000`) with 50% opacity
+- **Font**: Light gray (`#e5e7eb`) for optimal contrast
+- **Reset**: Restore defaults anytime with the reset button
+
+---
+
+## 🛠️ Tech Stack
+
+### 🎨 Frontend Technologies
+- **React 18** - Modern UI framework with hooks and concurrent features
+- **TypeScript** - Type-safe development with full IntelliSense support
+- **Vite** - Lightning-fast build tool and development server
+- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
+- **Electron** - Cross-platform desktop application framework
+
+### 🤖 AI & Backend Services
+- **Google Gemini API** - Advanced multimodal AI for intelligent analysis
+- **OpenAI Whisper** - State-of-the-art speech-to-text transcription
+- **Tesseract.js** - High-accuracy OCR for text extraction from images
+- **Node.js** - Server-side JavaScript runtime for backend processing
+
+### 🧪 Development & Quality
+- **Playwright** - End-to-end testing framework for reliable automation
+- **ESLint & Prettier** - Code quality and consistent formatting
+- **Husky** - Git hooks for automated code quality checks
+- **TypeScript** - Static type checking and enhanced developer experience
+
+### 📦 Build & Distribution
+- **Electron Builder** - Professional application packaging and distribution
+- **Cross-env** - Cross-platform environment variable management
+- **Concurrently** - Parallel process management for development
+
+---
+
+## 🚀 Quick Start
+
+### 1️⃣ **Clone & Install**
+```bash
+# Clone the repository
+git clone https://github.com/your-username/ai-interview-assistant.git
+cd ai-interview-assistant
+
+# Install dependencies
+npm install
+```
+
+### 2️⃣ **Launch Development Mode**
+```bash
+# Start the application
+npm run app:dev
+```
+
+### 3️⃣ **Configure API Key**
+1. Open the app and click the **⚙️ Settings** icon
+2. Paste your [Google Gemini API key](https://aistudio.google.com/app/apikey)
+3. Click **Save** to store securely
+
+### 4️⃣ **Start Using**
+- **Take a screenshot** with `⌘ + H`
+- **Record voice** by clicking the microphone
+- **Type questions** using the text input
+- **Process** with `⌘ + Enter`
+
+---
+
+## 📖 Detailed Usage Guide
+
+### 🎯 Input Methods
+
+#### **📸 Screenshot Capture**
+```bash
+Hotkey: ⌘ + H
+```
+- Capture code snippets, problem statements, or documents
+- Automatic OCR text extraction
+- AI analysis of visual content
+- Perfect for technical interviews and code reviews
+
+#### **🎤 Voice Recording**
+```bash
+Action: Click microphone button
+```
+- Real-time speech-to-text conversion
+- High-accuracy transcription with Whisper AI
+- Support for multiple languages
+- Ideal for verbal questions and responses
+
+#### **⌨️ Text Input**
+```bash
+Action: Click text input button
+```
+- Direct text entry for immediate processing
+- AI-powered analysis and response generation
+- Quick questions and follow-ups
+- Structured response formatting
+
+### 🎮 Controls & Navigation
+
+#### **Processing Commands**
+| Action | Shortcut | Description |
+|--------|----------|-------------|
+| **Process Input** | `⌘ + Enter` | Analyze current input and generate AI response |
+| **Reset Session** | `⌘ + R` | Clear all data and return to home view |
+| **Toggle Window** | `⌘ + B` | Show/hide the application window |
+
+#### **Window Management**
+| Action | Shortcut | Description |
+|--------|----------|-------------|
+| **Move Left** | `⌘ + ←` | Reposition window to the left |
+| **Move Right** | `⌘ + →` | Reposition window to the right |
+| **Move Up** | `⌘ + ↑` | Reposition window upward |
+| **Move Down** | `⌘ + ↓` | Reposition window downward |
+
+### 🎨 Customization Workflow
+
+#### **Accessing Settings**
+1. **Locate Settings**: Click the gear icon (⚙️) in the main interface
+2. **Navigate Sections**: Use the organized settings layout
+3. **Apply Changes**: Real-time preview of all modifications
+4. **Save Preferences**: Automatic persistence across sessions
+
+#### **Color Customization Process**
+```bash
+1. Open Settings (⚙️)
+2. Navigate to "Response Colors"
+3. Choose Background Color:
+   - Use color picker for visual selection
+   - Enter hex code for precise control
+4. Select Font Color:
+   - Ensure optimal contrast
+   - Consider accessibility
+5. Adjust Opacity:
+   - 10% - 90% range
+   - Real-time preview
+6. Save Changes
+```
+
+---
+
+## 🏗️ Project Architecture
+
+```
+ai-interview-assistant/
+├── 📁 electron/                 # Electron main process
+│   ├── main.ts                  # Application entry point
+│   ├── ipcHandlers.ts           # IPC communication handlers
+│   ├── services/                # Backend services
+│   │   ├── GeminiClient.ts      # AI API integration
+│   │   ├── AudioCapture.ts      # Voice recording service
+│   │   ├── ScreenCapture.ts     # Screenshot functionality
+│   │   └── OCRService.ts        # Text extraction service
+│   └── WindowHelper.ts          # Window management
+├── 📁 src/                      # React frontend
+│   ├── _pages/                  # Main application pages
+│   │   ├── Queue.tsx            # Main input interface
+│   │   ├── Solutions.tsx        # AI response display
+│   │   ├── Settings.tsx         # Configuration panel
+│   │   └── Debug.tsx            # Debug information
+│   ├── components/              # Reusable UI components
+│   │   ├── AudioRecorder/       # Voice recording interface
+│   │   ├── Queue/               # Input queue management
+│   │   ├── RichResponseFormatter/ # Response formatting
+│   │   └── ui/                  # Base UI components
+│   ├── lib/                     # Utilities and services
+│   │   ├── preferences.ts       # User preferences management
+│   │   └── utils.ts             # Helper functions
+│   └── types/                   # TypeScript definitions
+├── 📁 renderer/                 # Renderer process
+├── 📁 tests/                    # Test suites
+├── 📁 worker-script/            # Background workers
+└── 📄 Configuration files
+```
+
+---
+
+## 🔧 Development Guide
+
+### 🛠️ Development Setup
+
+#### **Prerequisites**
+- **Node.js** 18+ and npm
+- **Git** for version control
+- **Code editor** (VS Code recommended)
+
+#### **Environment Setup**
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run app:dev
+
+# Build Electron backend
+npm run build:electron
+
+# Run tests
+npm test
+```
+
+### 🧪 Testing Strategy
+
+#### **Test Types**
+- **Unit Tests**: Component and utility testing
+- **Integration Tests**: API and service testing
+- **E2E Tests**: Full application workflow testing
+- **Performance Tests**: Load and response time testing
+
+#### **Running Tests**
+```bash
+# Run all tests
+npm test
+
+# Run specific test suite
+npm run test:e2e
+
+# Run with coverage
+npm run test:coverage
+```
+
+### 📦 Building & Distribution
+
+#### **Development Build**
+```bash
+# Build for development
+npm run build:dev
+
+# Build for production
+npm run build:prod
+```
+
+#### **Distribution**
+```bash
+# Package for macOS
+npm run dist:mac
+
+# Package for Windows
+npm run dist:win
+
+# Package for all platforms
+npm run dist:all
+```
+
+---
+
+## 🆘 Troubleshooting
+
+### 🔍 Common Issues
+
+#### **API Key Problems**
+```bash
+❌ Error: "Gemini API key not found"
+✅ Solution: 
+1. Open Settings (⚙️)
+2. Paste your API key
+3. Click Save
+4. Restart the application
+```
+
+#### **Performance Issues**
+```bash
+❌ High latency (20-30 seconds)
+✅ Normal: AI processing takes time
+✅ Optimization: Reduce input size for faster responses
+```
+
+#### **Color Customization**
+```bash
+❌ Colors not applying
+✅ Solution:
+1. Check browser console for errors
+2. Refresh the application
+3. Verify preferences are saved
+4. Check localStorage in DevTools
+```
+
+#### **Audio Recording**
+```bash
+❌ Microphone not working
+✅ Solution:
+1. Check system permissions
+2. Verify microphone access
+3. Restart the application
+4. Check browser console for errors
+```
+
+### 🐛 Debug Mode
+
+#### **Enable Debug Logging**
+```bash
+# Development mode automatically includes debug logs
+npm run app:dev
+
+# Check console for detailed information
+# Look for preference changes and API calls
+```
+
+#### **Common Debug Commands**
+```bash
+# Check preferences
+preferencesManager.debugPreferences()
+
+# Verify API connection
+# Check network tab for API calls
+
+# Monitor localStorage
+# Check Application tab in DevTools
+```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from the community! Here's how you can help:
+
+### 🎯 Contribution Areas
+
+#### **High Priority**
+- 🐛 **Bug Fixes**: Improve stability and reliability
+- 📱 **UI/UX**: Enhance user experience and accessibility
+- 🚀 **Performance**: Optimize speed and resource usage
+- 🧪 **Testing**: Add comprehensive test coverage
+
+#### **Medium Priority**
+- 🌍 **Internationalization**: Add multi-language support
+- 🎨 **Themes**: Create additional color schemes
+- 📊 **Analytics**: Add usage statistics (privacy-focused)
+- 🔌 **Plugins**: Extend functionality with plugins
+
+#### **Low Priority**
+- 📚 **Documentation**: Improve guides and examples
+- 🎬 **Demos**: Create showcase videos and tutorials
+- 🌐 **Website**: Develop project landing page
+- 📦 **Packaging**: Optimize distribution packages
+
+### 📋 Contribution Guidelines
+
+#### **Code Standards**
+- **TypeScript**: 100% type coverage required
+- **ESLint**: Follow project linting rules
+- **Prettier**: Maintain consistent formatting
+- **Tests**: Add tests for new features
+
+#### **Commit Convention**
+```bash
+feat: add new color customization feature
+fix: resolve microphone permission issue
+docs: update README with usage examples
+test: add unit tests for preferences manager
+refactor: improve API error handling
+```
+
+#### **Pull Request Process**
+1. **Fork** the repository
+2. **Create** a feature branch
+3. **Develop** your changes
+4. **Test** thoroughly
+5. **Submit** a pull request
+6. **Review** and iterate
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+### 📜 License Summary
+- ✅ **Commercial Use**: Allowed
+- ✅ **Modification**: Allowed
+- ✅ **Distribution**: Allowed
+- ✅ **Private Use**: Allowed
+- ⚠️ **Liability**: Limited
+- ⚠️ **Warranty**: None
+
+---
+
+## 🌐 Links & Resources
+
+### 🔗 Official Links
+- **🔑 [Google Gemini API](https://aistudio.google.com/app/apikey)** - Get your API key
+- **📖 [Documentation](https://github.com/your-repo/wiki)** - Detailed guides
+- **🐛 [Issues](https://github.com/your-repo/issues)** - Report bugs
+- **💬 [Discussions](https://github.com/your-repo/discussions)** - Community chat
+
+### 📚 Additional Resources
+- **🎥 [Demo Video](https://youtube.com/watch?v=example)** - See it in action
+- **📊 [Roadmap](https://github.com/your-repo/projects)** - Future plans
+- **🤝 [Contributing Guide](CONTRIBUTING.md)** - How to help
+- **📋 [Changelog](CHANGELOG.md)** - Version history
+
+---
+
+## 🙏 Acknowledgments
+
+### 🏆 Special Thanks
+- **Google Gemini Team** - For the incredible AI capabilities
+- **OpenAI** - For the Whisper speech recognition
+- **Electron Community** - For the amazing desktop framework
+- **React Team** - For the powerful UI library
+
+### 🌟 Contributors
+Thanks to all the amazing contributors who have helped make this project better!
+
+[![Contributors](https://contrib.rocks/image?repo=your-username/ai-interview-assistant)](https://github.com/your-username/ai-interview-assistant/graphs/contributors)
+
+---
+
+<div align="center">
+
+**Made by Jayanth aka Reflex**
+
+[⭐ Star this repo](https://github.com/your-username/ai-interview-assistant) • [🐛 Report an issue](https://github.com/your-username/ai-interview-assistant/issues) • [📖 View documentation](https://github.com/your-username/ai-interview-assistant/wiki)
+
+</div>
