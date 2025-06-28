@@ -1,4 +1,11 @@
 import React, { useEffect, useState } from "react"
+import {
+  Toast,
+  ToastTitle,
+  ToastDescription,
+  ToastVariant,
+  ToastMessage
+} from "../components/ui/toast"
 
 interface SettingsProps {
   setView: React.Dispatch<React.SetStateAction<'queue' | 'solutions' | 'debug' | 'settings'>>
@@ -7,30 +14,53 @@ interface SettingsProps {
 const Settings: React.FC<SettingsProps> = ({ setView }) => {
   const [apiKey, setApiKey] = useState("")
   const [status, setStatus] = useState<null | "success" | "error">(null)
+  const [toastMessage, setToastMessage] = useState<ToastMessage>({
+    title: "",
+    description: "",
+    variant: "neutral"
+  })
+  const [toastOpen, setToastOpen] = useState(false)
 
   useEffect(() => {
-    // Load the API key from main process on mount
-    window.electronAPI?.getGeminiApiKey?.().then((key: string) => {
-      if (key) setApiKey(key)
+    ;(window.electronAPI as any)?.getGeminiApiKey?.().then((key: string) => {
+      setApiKey(key)
     })
   }, [])
 
   const handleSave = async () => {
     try {
-      await window.electronAPI?.setGeminiApiKey?.(apiKey)
-      setStatus("success")
+      await (window.electronAPI as any)?.setGeminiApiKey?.(apiKey)
+      setToastMessage({
+        title: "Success",
+        description: "API key saved successfully",
+        variant: "success"
+      })
+      setToastOpen(true)
       setTimeout(() => {
-        setStatus(null)
         setView("queue")
-      }, 1200)
-    } catch (e) {
-      setStatus("error")
-      setTimeout(() => setStatus(null), 2000)
+      }, 1500)
+    } catch (error) {
+      setToastMessage({
+        title: "Error",
+        description: "Failed to save API key",
+        variant: "error"
+      })
+      setToastOpen(true)
     }
   }
 
   return (
     <div className="p-6 max-w-md mx-auto">
+      <Toast
+        open={toastOpen}
+        onOpenChange={setToastOpen}
+        variant={toastMessage.variant}
+        duration={3000}
+      >
+        <ToastTitle>{toastMessage.title}</ToastTitle>
+        <ToastDescription>{toastMessage.description}</ToastDescription>
+      </Toast>
+      
       <h2 className="text-xl font-bold mb-4">Settings</h2>
       <label className="block mb-2 font-medium">Gemini API Key</label>
       <input

@@ -3,6 +3,8 @@
 import { AppState } from "./main"
 import { LLMHelper } from "./LLMHelper"
 import dotenv from "dotenv"
+import path from "path"
+import fs from "fs"
 
 dotenv.config()
 
@@ -12,85 +14,107 @@ const MOCK_API_WAIT_TIME = Number(process.env.MOCK_API_WAIT_TIME) || 500
 
 export class ProcessingHelper {
   private appState: AppState
-  private llmHelper: LLMHelper
+  private llmHelper: LLMHelper | null = null
   private currentProcessingAbortController: AbortController | null = null
   private currentExtraProcessingAbortController: AbortController | null = null
 
   constructor(appState: AppState) {
     this.appState = appState
-    const apiKey = process.env.GEMINI_API_KEY
-    if (!apiKey) {
-      throw new Error("GEMINI_API_KEY not found in environment variables")
-    }
-    this.llmHelper = new LLMHelper(apiKey)
   }
 
-  public async processScreenshots(): Promise<void> {
+  public async getLLMHelper(): Promise<LLMHelper> {
+    if (!this.llmHelper) {
+      const configPath = path.join(require('electron').app.getPath('userData'), 'config.json')
+      let apiKey = ''
+      
+      try {
+        if (fs.existsSync(configPath)) {
+          const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
+          apiKey = config.apiKey || ''
+        }
+      } catch (error) {
+        console.error('Error reading config file:', error)
+      }
+      
+      if (!apiKey) {
+        throw new Error("Gemini API key not found. Please set it in Settings.")
+      }
+      
+      this.llmHelper = new LLMHelper(apiKey)
+    }
+    return this.llmHelper
+  }
+
+  public async processScreenshots(inputQueue?: Array<{ type: 'screenshot' | 'audio' | 'text', value: string }>): Promise<void> {
     const mainWindow = this.appState.getMainWindow()
     if (!mainWindow) return
 
     const view = this.appState.getView()
 
-    if (view === "queue") {
+    // If inputQueue is provided, use it; otherwise, fall back to screenshot queue
+    let queue = inputQueue
+    if (!queue) {
       const screenshotQueue = this.appState.getScreenshotHelper().getScreenshotQueue()
-      if (screenshotQueue.length === 0) {
+      queue = screenshotQueue.map((path) => {
+        if (path.endsWith('.mp3') || path.endsWith('.wav')) {
+          return { type: 'audio' as const, value: path }
+        } else if (path.endsWith('.txt')) {
+          return { type: 'text' as const, value: path }
+        } else {
+          return { type: 'screenshot' as const, value: path }
+        }
+      })
+    }
+
+    if (view === "queue") {
+      if (!queue || queue.length === 0) {
         mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.NO_SCREENSHOTS)
         return
       }
 
-      // Check if last screenshot is an audio file
-      const allPaths = this.appState.getScreenshotHelper().getScreenshotQueue();
-      const lastPath = allPaths[allPaths.length - 1];
-      if (lastPath.endsWith('.mp3') || lastPath.endsWith('.wav')) {
-        mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.INITIAL_START);
-        this.appState.setView('solutions');
-        try {
-          const audioResult = await this.llmHelper.analyzeAudioFile(lastPath);
-          const problemInfo = {
-            problem_statement: audioResult.text,
-            input_format: { description: "Generated from audio input", parameters: [] },
-            output_format: { description: "Generated from audio input", type: "string", subtype: "voice" },
-            complexity: { time: "N/A", space: "N/A" },
-            test_cases: [],
-            validation_type: "manual",
-            difficulty: "custom"
-          };
-          mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.PROBLEM_EXTRACTED, problemInfo);
-          this.appState.setProblemInfo(problemInfo);
-          this.appState.clearQueues();
-          return;
-        } catch (err: any) {
-          console.error('Audio processing error:', err);
-          mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.INITIAL_SOLUTION_ERROR, err.message);
-          this.appState.clearQueues();
-          return;
-        }
-      }
-
-      // NEW: Handle screenshot as plain text (like audio)
       mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.INITIAL_START)
-      this.appState.setView("solutions")
-      this.currentProcessingAbortController = new AbortController()
+      this.appState.setView('solutions')
+
+      let combinedText = ''
+      let inputTypes: Array<'screenshot' | 'audio' | 'text'> = []
       try {
-        const imageResult = await this.llmHelper.analyzeImageFile(lastPath);
+        for (const item of queue) {
+          inputTypes.push(item.type)
+          if (item.type === 'screenshot') {
+            const llmHelper = await this.getLLMHelper()
+            const imageResult = await llmHelper.analyzeImageFile(item.value)
+            combinedText += imageResult.text + '\n'
+          } else if (item.type === 'audio') {
+            const llmHelper = await this.getLLMHelper()
+            const audioResult = await llmHelper.analyzeAudioFile(item.value)
+            combinedText += audioResult.text + '\n'
+          } else if (item.type === 'text') {
+            const textContent = await this.readTextFile(item.value)
+            const llmHelper = await this.getLLMHelper()
+            const textResult = await llmHelper.analyzeTextInput(textContent)
+            combinedText += textResult.text + '\n'
+          }
+        }
         const problemInfo = {
-          problem_statement: imageResult.text,
-          input_format: { description: "Generated from screenshot", parameters: [] as any[] },
-          output_format: { description: "Generated from screenshot", type: "string", subtype: "text" },
+          problem_statement: combinedText.trim(),
+          input_types: inputTypes,
+          input_format: { description: "Generated from input queue", parameters: [] as any[] },
+          output_format: { description: "Generated from input queue", type: "string", subtype: "text" },
           complexity: { time: "N/A", space: "N/A" },
           test_cases: [] as any[],
           validation_type: "manual",
           difficulty: "custom"
-        };
-        mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.PROBLEM_EXTRACTED, problemInfo);
-        this.appState.setProblemInfo(problemInfo);
-      } catch (error: any) {
-        console.error("Image processing error:", error)
-        mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.INITIAL_SOLUTION_ERROR, error.message)
-      } finally {
-        this.currentProcessingAbortController = null
+        }
+        mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.PROBLEM_EXTRACTED, problemInfo)
+        this.appState.setProblemInfo(problemInfo)
+        this.appState.clearQueues()
+        return
+      } catch (err: any) {
+        console.error('Processing error:', err)
+        mainWindow.webContents.send(this.appState.PROCESSING_EVENTS.INITIAL_SOLUTION_ERROR, err.message)
+        this.appState.clearQueues()
+        return
       }
-      return;
     } else {
       // Debug mode
       const extraScreenshotQueue = this.appState.getScreenshotHelper().getExtraScreenshotQueue()
@@ -111,11 +135,12 @@ export class ProcessingHelper {
         }
 
         // Get current solution from state
-        const currentSolution = await this.llmHelper.generateSolution(problemInfo)
+        const llmHelper = await this.getLLMHelper()
+        const currentSolution = await llmHelper.generateSolution(problemInfo)
         const currentCode = currentSolution.text // Now returns {text, timestamp}
 
         // Debug the solution using vision model
-        const debugResult = await this.llmHelper.debugSolutionWithImages(
+        const debugResult = await llmHelper.debugSolutionWithImages(
           problemInfo,
           currentCode,
           extraScreenshotQueue
@@ -155,15 +180,19 @@ export class ProcessingHelper {
 
   public async processAudioBase64(data: string, mimeType: string) {
     // Directly use LLMHelper to analyze inline base64 audio
-    return this.llmHelper.analyzeAudioFromBase64(data, mimeType);
+    const llmHelper = await this.getLLMHelper()
+    return llmHelper.analyzeAudioFromBase64(data, mimeType);
   }
 
   // Add audio file processing method
   public async processAudioFile(filePath: string) {
-    return this.llmHelper.analyzeAudioFile(filePath);
+    const llmHelper = await this.getLLMHelper()
+    return llmHelper.analyzeAudioFile(filePath);
   }
 
-  public getLLMHelper() {
-    return this.llmHelper;
+  // Add text file reading method
+  public async readTextFile(filePath: string): Promise<string> {
+    const fs = require('fs');
+    return await fs.promises.readFile(filePath, 'utf-8');
   }
 }

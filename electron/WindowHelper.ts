@@ -96,6 +96,17 @@ export class WindowHelper {
     }
 
     this.mainWindow = new BrowserWindow(windowSettings)
+    
+    // Set Content Security Policy to fix security warning
+    this.mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+      callback({
+        responseHeaders: {
+          ...details.responseHeaders,
+          'Content-Security-Policy': "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self' http: https:;"
+        }
+      })
+    })
+    
     // this.mainWindow.webContents.openDevTools()
     this.mainWindow.setContentProtection(true)
 

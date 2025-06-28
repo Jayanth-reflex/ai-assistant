@@ -14,6 +14,8 @@ interface QueueProps {
   setView: React.Dispatch<React.SetStateAction<"queue" | "solutions" | "debug" | "settings">>
 }
 
+const isElectronAPIAvailable = typeof window !== 'undefined' && !!window.electronAPI;
+
 const Queue: React.FC<QueueProps> = ({ setView }) => {
   const [toastOpen, setToastOpen] = useState(false)
   const [toastMessage, setToastMessage] = useState<ToastMessage>({
@@ -26,10 +28,18 @@ const Queue: React.FC<QueueProps> = ({ setView }) => {
   const [tooltipHeight, setTooltipHeight] = useState(0)
   const contentRef = useRef<HTMLDivElement>(null)
 
-  const { data: screenshots = [], refetch } = useQuery<Array<{ path: string; preview: string }>, Error>(
+  const [textInput, setTextInput] = useState("")
+  const [showTextInput, setShowTextInput] = useState(false)
+
+  const { data: screenshots = [], refetch } = useQuery<Array<{ path: string; preview: string; type?: 'image' | 'audio' | 'text' | 'unknown' }>, Error>(
     ["screenshots"],
     async () => {
       try {
+        if (!isElectronAPIAvailable) {
+          console.error("Electron API is not available")
+          showToast("Error", "Electron API is not available", "error")
+          return []
+        }
         const existing = await window.electronAPI.getScreenshots()
         return existing
       } catch (error) {
@@ -59,6 +69,11 @@ const Queue: React.FC<QueueProps> = ({ setView }) => {
     const screenshotToDelete = screenshots[index]
 
     try {
+      if (!isElectronAPIAvailable) {
+        console.error("Electron API is not available")
+        showToast("Error", "Electron API is not available", "error")
+        return
+      }
       const response = await window.electronAPI.deleteScreenshot(
         screenshotToDelete.path
       )
@@ -74,6 +89,35 @@ const Queue: React.FC<QueueProps> = ({ setView }) => {
     }
   }
 
+  // Add text input to queue
+  const handleAddText = async () => {
+    if (textInput.trim()) {
+      try {
+        if (!isElectronAPIAvailable) {
+          console.error("Electron API is not available")
+          showToast("Error", "Electron API is not available", "error")
+          return
+        }
+        console.log("Adding text input:", textInput.trim())
+        const fileName = `text_${Date.now()}.txt`;
+        const textEncoder = new TextEncoder();
+        const uint8Array = textEncoder.encode(textInput.trim());
+        // Send Uint8Array directly
+        const tempPath = await (window.electronAPI as any).saveTempFile(fileName, uint8Array);
+        console.log("File saved to temp path:", tempPath)
+        console.log("Adding file to queue...")
+        await (window.electronAPI as any).addFileToQueue(tempPath);
+        console.log("File added to queue successfully")
+        setTextInput("")
+        setShowTextInput(false)
+        refetch()
+      } catch (error) {
+        console.error("Error adding text input:", error)
+        showToast("Error", "Failed to add text input", "error")
+      }
+    }
+  }
+
   useEffect(() => {
     const updateDimensions = () => {
       if (contentRef.current) {
@@ -81,6 +125,11 @@ const Queue: React.FC<QueueProps> = ({ setView }) => {
         const contentWidth = contentRef.current.scrollWidth
         if (isTooltipVisible) {
           contentHeight += tooltipHeight
+        }
+        if (!isElectronAPIAvailable) {
+          console.error("Electron API is not available")
+          showToast("Error", "Electron API is not available", "error")
+          return
         }
         window.electronAPI.updateContentDimensions({
           width: contentWidth,
@@ -140,6 +189,39 @@ const Queue: React.FC<QueueProps> = ({ setView }) => {
           <ToastDescription>{toastMessage.description}</ToastDescription>
         </Toast>
 
+        {/* Text Input Modal/Popover */}
+        {showTextInput && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md flex flex-col gap-4">
+              <div className="text-base font-semibold text-gray-800">Type or paste a problem statement</div>
+              <input
+                className="flex-1 px-2 py-1 rounded border border-gray-300 text-sm"
+                type="text"
+                placeholder="Type or paste a problem statement..."
+                value={textInput}
+                onChange={(e) => setTextInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleAddText() }}
+                autoFocus
+              />
+              <div className="flex gap-2 justify-end">
+                <button
+                  className="px-3 py-1 rounded bg-gray-200 text-gray-700 text-xs hover:bg-gray-300"
+                  onClick={() => { setShowTextInput(false); setTextInput("") }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-3 py-1 rounded bg-blue-600 text-white text-xs hover:bg-blue-700"
+                  onClick={handleAddText}
+                  disabled={!textInput.trim()}
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-3 w-fit">
           <ScreenshotQueue
             isLoading={false}
@@ -150,6 +232,7 @@ const Queue: React.FC<QueueProps> = ({ setView }) => {
             screenshots={screenshots}
             onTooltipVisibilityChange={handleTooltipVisibilityChange}
             setView={setView}
+            onShowTextInput={() => setShowTextInput(true)}
           />
         </div>
       </div>

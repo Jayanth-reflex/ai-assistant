@@ -1,17 +1,19 @@
 import { contextBridge, ipcRenderer } from "electron"
 
+console.log('[PRELOAD] Electron preload script loaded');
+
 // Types for the exposed Electron API
 interface ElectronAPI {
   updateContentDimensions: (dimensions: {
     width: number
     height: number
   }) => Promise<void>
-  getScreenshots: () => Promise<Array<{ path: string; preview: string }>>
+  getScreenshots: () => Promise<Array<{ path: string; preview: string; type?: 'image' | 'audio' | 'text' | 'unknown' }>>
   deleteScreenshot: (
     path: string
   ) => Promise<{ success: boolean; error?: string }>
   onScreenshotTaken: (
-    callback: (data: { path: string; preview: string }) => void
+    callback: (data: { path: string; preview: string; type?: 'image' | 'audio' | 'text' | 'unknown' }) => void
   ) => () => void
   onSolutionsReady: (callback: (solutions: string) => void) => () => void
   onResetView: (callback: () => void) => () => void
@@ -32,11 +34,14 @@ interface ElectronAPI {
   analyzeAudioFile: (path: string) => Promise<{ text: string; timestamp: number }>
   analyzeImageFile: (path: string) => Promise<void>
   quitApp: () => Promise<void>
-  saveTempFile: (fileName: string, buffer: Buffer) => Promise<string>
+  saveTempFile: (fileName: string, data: Uint8Array | ArrayBuffer) => Promise<string>
   getCurrentSessionPath: () => Promise<string>
   listSessions: () => Promise<string[]>
   getGeminiApiKey: () => Promise<string>
   setGeminiApiKey: (key: string) => Promise<void>
+  addFileToQueue: (filePath: string) => Promise<{ success: boolean; error?: string }>
+  version: () => string;
+  ping: () => string;
 }
 
 export const PROCESSING_EVENTS = {
@@ -58,6 +63,8 @@ export const PROCESSING_EVENTS = {
 
 // Expose the Electron API to the renderer process
 contextBridge.exposeInMainWorld("electronAPI", {
+  version: () => '1.0.0',
+  ping: () => 'pong',
   updateContentDimensions: (dimensions: { width: number; height: number }) =>
     ipcRenderer.invoke("update-content-dimensions", dimensions),
   takeScreenshot: () => ipcRenderer.invoke("take-screenshot"),
@@ -67,9 +74,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
   // Event listeners
   onScreenshotTaken: (
-    callback: (data: { path: string; preview: string }) => void
+    callback: (data: { path: string; preview: string; type?: 'image' | 'audio' | 'text' | 'unknown' }) => void
   ) => {
-    const subscription = (_: any, data: { path: string; preview: string }) =>
+    const subscription = (_: any, data: { path: string; preview: string; type?: 'image' | 'audio' | 'text' | 'unknown' }) =>
       callback(data)
     ipcRenderer.on("screenshot-taken", subscription)
     return () => {
@@ -171,9 +178,18 @@ contextBridge.exposeInMainWorld("electronAPI", {
   analyzeAudioFile: (path: string) => ipcRenderer.invoke("analyze-audio-file", path),
   analyzeImageFile: (path: string) => ipcRenderer.invoke("analyze-image-file", path),
   quitApp: () => ipcRenderer.invoke("quit-app"),
-  saveTempFile: (fileName: string, buffer: Buffer) => ipcRenderer.invoke('save-temp-file', fileName, buffer),
+  saveTempFile: (fileName: string, data: Uint8Array | ArrayBuffer) => {
+    let buffer: Buffer;
+    if (data instanceof ArrayBuffer) {
+      buffer = Buffer.from(new Uint8Array(data));
+    } else {
+      buffer = Buffer.from(data);
+    }
+    return ipcRenderer.invoke('save-temp-file', fileName, buffer);
+  },
   getCurrentSessionPath: () => ipcRenderer.invoke('get-current-session-path'),
   listSessions: () => ipcRenderer.invoke('list-sessions'),
   getGeminiApiKey: () => ipcRenderer.invoke('get-gemini-api-key'),
   setGeminiApiKey: (key: string) => ipcRenderer.invoke('set-gemini-api-key', key),
+  addFileToQueue: (filePath: string) => ipcRenderer.invoke('add-file-to-queue', filePath),
 } as ElectronAPI)

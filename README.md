@@ -12,14 +12,8 @@
 
 ### Ethical Usage Guidelines
 - **Consent**: Ensure all participants in meetings/interviews are aware of and consent to AI assistance
-- **Transparency**: Disclose the use of AI tools when required by company policies or regulations
-- **Professional Use**: Use responsibly and in accordance with your organization's guidelines
-- **No Recording Without Permission**: Always obtain proper consent before recording or analyzing conversations
-
-### Compliance
-- **GDPR**: Compliant with data protection regulations through local-only processing
-- **Corporate Policies**: Review and comply with your organization's AI usage policies
-- **Industry Standards**: Follow ethical AI guidelines and best practices
+- **Transparency**: Use the tool responsibly and inform others when AI is being used
+- **Compliance**: Follow all applicable laws, regulations, and company policies
 
 ## 🚀 Features
 
@@ -63,187 +57,57 @@
 - **Cross-env** - Cross-platform environment variable management
 - **Concurrently** - Parallel process management
 
-## 📦 Installation & Setup
+## 🚀 Setup & Usage
 
-### Prerequisites
-- **Node.js** (v18 or higher) - [Download here](https://nodejs.org/)
-- **Git** - [Download here](https://git-scm.com/)
-- **Python 3.8+** - Required for Whisper STT
-- **Gemini API Key** - Free from Google AI Studio
-
-### Step 1: Get Your Gemini API Key
-
-1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Sign in with your Google account
-3. Click "Create API Key"
-4. Copy the generated API key (starts with `AIza...`)
-5. Keep this key secure - you'll need it for setup
-
-### Step 2: Clone and Install
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/ai-meetings-assistant.git
-cd ai-meetings-assistant
-
-# Install Node.js dependencies
+### 1. **Install Dependencies**
+```sh
 npm install
-
-# Install Python dependencies for Whisper
-pip3 install openai-whisper torch
 ```
 
-### Step 3: Configure Environment
-
-1. Create a `.env` file in the project root:
-```bash
-touch .env
-```
-
-2. Add your Gemini API key to the `.env` file:
-```env
-GEMINI_API_KEY=your_actual_api_key_here
-```
-
-**⚠️ Security Note**: Never commit your `.env` file to version control. It's already included in `.gitignore`.
-
-### Step 4: Install Whisper (Speech-to-Text)
-
-#### macOS
-```bash
-# Install Python if not already installed
-brew install python
-
-# Install Whisper and PyTorch
-pip3 install openai-whisper torch
-
-# Verify installation
-python3 -c "import whisper; print('Whisper installed successfully')"
-```
-
-#### Windows
-```bash
-# Download Python from python.org and add to PATH
-# Then install Whisper
-pip install openai-whisper torch
-
-# Verify installation
-python -c "import whisper; print('Whisper installed successfully')"
-```
-
-## 🚀 Running the Application
-
-### Development Mode (Recommended for first run)
-
-```bash
-# Start the development server and Electron app
+### 2. **Start the App in Development Mode**
+```sh
 npm run app:dev
 ```
 
-This command will:
-- Start the Vite development server on port 5180
-- Launch the Electron application
-- Enable hot reloading for development
+### 3. **Set Your Gemini API Key (In-App Settings)**
+- Launch the app.
+- Click the **Settings** (gear icon) button in the main interface (beside the Record Voice button).
+- Paste your [Google Gemini API key](https://aistudio.google.com/app/apikey) into the input field and click **Save**.
+- Your API key is securely stored in your local app data and will persist across sessions.
 
-### Production Build
+> **Note:** You no longer need to edit a `.env` file. All API key management is handled securely in-app.
 
-```bash
-# Build the application
-npm run build
+### 4. **Using the App**
+- **Take a Screenshot**: Use the shortcut (Cmd+H) to capture a problem statement or code.
+- **Record Voice**: Click the microphone button to record a spoken question or answer.
+- **Process (Cmd+Enter)**: Processes the current input (screenshot or voice) and generates an AI-powered response.
+- **Reset (Cmd+R)**: Clears the current session and returns to the home view.
 
-# The built app will be in the release/ folder
-```
+## 🧑‍💻 Contributing
+- Fork the repo and create a feature branch
+- Submit a pull request with a clear description
 
-## ⌨️ Keyboard Shortcuts
+## 📄 License
+MIT License
 
-| Shortcut | Action |
-|----------|--------|
-| `Cmd/Ctrl + B` | Toggle window visibility |
-| `Cmd/Ctrl + H` | Take screenshot and analyze |
-| `Cmd/Ctrl + Enter` | Get AI solution/assistance |
-| `Cmd/Ctrl + R` | Reset/clear current session |
-| `Cmd/Ctrl + Arrow Keys` | Move window position |
-| `Cmd/Ctrl + Q` | Quit application |
-
-## 🔧 Troubleshooting
-
-### Common Issues
-
-**App won't start:**
-```bash
-# Kill existing processes on port 5180
-lsof -i :5180
-kill -9 [PID]
-
-# Clear npm cache and reinstall
-rm -rf node_modules package-lock.json
-npm install
-```
-
-**Whisper not working:**
-```bash
-# Reinstall Whisper
-pip3 uninstall openai-whisper
-pip3 install openai-whisper torch
-
-# Test installation
-python3 -c "import whisper; model = whisper.load_model('base'); print('OK')"
-```
-
-**API Key issues:**
-- Verify your `.env` file exists and contains the correct API key
-- Check that the API key starts with `AIza`
-- Ensure you have sufficient Gemini API quota
-
-### Performance Optimization
-
-- **GPU Acceleration**: Install CUDA for faster Whisper processing (optional)
-- **Memory Usage**: Close other applications if experiencing slowdowns
-- **Storage**: Ensure adequate disk space for session data
+## 🌐 Links
+- [Google Gemini API Key Signup](https://aistudio.google.com/app/apikey)
+- [Project Issues](https://github.com/your-repo/issues)
 
 ## 📁 Project Structure
 
 ```
-ai-meetings-assistant/
-├── electron/           # Electron main process
-│   ├── services/      # Backend services
-│   └── main.ts        # Main process entry
-├── src/               # React frontend
-│   ├── components/    # UI components
-│   ├── _pages/        # Page components
-│   └── types/         # TypeScript definitions
-├── tests/             # Test files
-├── release/           # Built application
-└── .env              # Environment variables (not in git)
+.
+├── electron/         # Electron main process & backend services
+├── src/              # React frontend (pages, components, types)
+├── renderer/         # Renderer process (React app entry, assets)
+├── tests/            # Automated and unit tests
+├── worker-script/    # Node worker scripts
+├── package.json      # Project metadata & scripts
+├── README.md         # Project documentation
+├── LICENSE           # License file
+└── ... (other config and meta files)
 ```
-
-## 🤝 Contributing
-
-We welcome contributions! Please:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Development Guidelines
-- Follow TypeScript best practices
-- Add tests for new features
-- Update documentation as needed
-- Ensure all tests pass before submitting
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## ⚖️ Disclaimer
-
-This application is provided "as is" without warranties. Users are responsible for:
-- Complying with local laws and regulations
-- Obtaining proper consent for recording/analysis
-- Following their organization's policies
-- Using the application ethically and responsibly
 
 ## 🆘 Support
 
@@ -253,5 +117,3 @@ For support and questions:
 - Open an issue for bugs or feature requests
 
 ---
-
-**Built with ❤️ for professional interview assistance**

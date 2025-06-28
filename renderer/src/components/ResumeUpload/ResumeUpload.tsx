@@ -2,6 +2,9 @@
 // Resume/document upload and parsing component
 import React, { useState } from 'react';
 
+// At the top of the file, add a check for window.electronAPI
+const isElectronAPIAvailable = typeof window !== 'undefined' && !!window.electronAPI;
+
 /**
  * ResumeUpload allows the user to upload a PDF or DOCX resume, parses key fields, and displays the extracted data.
  */

@@ -147,4 +147,54 @@ export class ScreenshotHelper {
       return { success: false, error: error.message }
     }
   }
+
+  // Add a file to the screenshot queue (for voice recordings and text input)
+  public addFileToQueue(filePath: string): void {
+    const fileName = path.basename(filePath)
+    let newPath = filePath
+    
+    // If file is in temp directory, move it to screenshot directory
+    if (filePath.includes('ai-interview-assistant')) {
+      if (this.view === "queue") {
+        newPath = path.join(this.screenshotDir, fileName)
+      } else {
+        newPath = path.join(this.extraScreenshotDir, fileName)
+      }
+      
+      try {
+        // Move file from temp to screenshot directory
+        fs.renameSync(filePath, newPath)
+      } catch (error) {
+        console.error("Error moving file from temp to screenshot directory:", error)
+        // If move fails, just use the original path
+        newPath = filePath
+      }
+    }
+    
+    if (this.view === "queue") {
+      this.screenshotQueue.push(newPath)
+      if (this.screenshotQueue.length > this.MAX_SCREENSHOTS) {
+        const removedPath = this.screenshotQueue.shift()
+        if (removedPath) {
+          try {
+            fs.unlinkSync(removedPath)
+          } catch (error) {
+            console.error("Error removing old file:", error)
+          }
+        }
+      }
+    } else {
+      this.extraScreenshotQueue.push(newPath)
+      if (this.extraScreenshotQueue.length > this.MAX_SCREENSHOTS) {
+        const removedPath = this.extraScreenshotQueue.shift()
+        if (removedPath) {
+          try {
+            fs.unlinkSync(removedPath)
+          } catch (error) {
+            console.error("Error removing old file:", error)
+          }
+        }
+      }
+    }
+  }
 }

@@ -356,4 +356,12 @@ Estimated Time: [X minutes]`
     const result = await this.model.generateContent([prompt, imagePart])
     return { text: (await result.response).text(), timestamp: Date.now() }
   }
+
+  public async analyzeTextInput(text: string) {
+    // Select appropriate prompt based on content
+    const selectedPrompt = this.selectPrompt(text)
+    const prompt = `${selectedPrompt}\n\nAnalyze this text input and provide structured interview coaching.`
+    const result = await this.model.generateContent([prompt, text])
+    return { text: (await result.response).text(), timestamp: Date.now() }
+  }
 }

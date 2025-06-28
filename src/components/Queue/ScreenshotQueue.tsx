@@ -4,6 +4,7 @@ import ScreenshotItem from "./ScreenshotItem"
 interface Screenshot {
   path: string
   preview: string
+  type?: 'image' | 'audio' | 'text' | 'unknown'
 }
 
 interface ScreenshotQueueProps {

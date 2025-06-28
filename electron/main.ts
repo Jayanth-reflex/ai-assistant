@@ -165,6 +165,10 @@ export class AppState {
     return this.screenshotHelper.deleteScreenshot(path)
   }
 
+  public addFileToQueue(filePath: string): void {
+    this.screenshotHelper.addFileToQueue(filePath)
+  }
+
   // New methods to move the window
   public moveWindowLeft(): void {
     this.windowHelper.moveWindowLeft()
@@ -229,10 +233,12 @@ async function initializeApp() {
 
   // Save a temp file (for resume upload)
   ipcMain.handle('save-temp-file', async (_event, fileName: string, buffer: Buffer) => {
+    console.log("save-temp-file called with fileName:", fileName, "buffer length:", buffer.length)
     const tempDir = path.join(app.getPath('temp'), 'ai-interview-assistant')
     if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true })
     const tempPath = path.join(tempDir, `${Date.now()}_${fileName}`)
     fs.writeFileSync(tempPath, buffer)
+    console.log("File saved to temp path:", tempPath)
     return tempPath
   })
 

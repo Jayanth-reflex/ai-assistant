@@ -26,34 +26,58 @@ export function initializeIpcHandlers(appState: AppState): void {
       return { path: screenshotPath, preview }
     } catch (error) {
       console.error("Error taking screenshot:", error)
-      throw error
+      return { success: false, error: error.message || String(error) }
     }
   })
 
   ipcMain.handle("get-screenshots", async () => {
     console.log({ view: appState.getView() })
     try {
-      let previews = []
+      let files = []
       if (appState.getView() === "queue") {
-        previews = await Promise.all(
-          appState.getScreenshotQueue().map(async (path) => ({
-            path,
-            preview: await appState.getImagePreview(path)
-          }))
-        )
+        files = appState.getScreenshotQueue()
       } else {
-        previews = await Promise.all(
-          appState.getExtraScreenshotQueue().map(async (path) => ({
-            path,
-            preview: await appState.getImagePreview(path)
-          }))
-        )
+        files = appState.getExtraScreenshotQueue()
       }
+      
+      const previews = await Promise.all(
+        files.map(async (filePath) => {
+          const ext = path.extname(filePath).toLowerCase()
+          
+          if (ext === '.png' || ext === '.jpg' || ext === '.jpeg') {
+            // Image files - get actual preview
+            const preview = await appState.getImagePreview(filePath)
+            return { path: filePath, preview, type: 'image' }
+          } else if (ext === '.mp3' || ext === '.wav') {
+            // Audio files - return audio icon
+            return { 
+              path: filePath, 
+              preview: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iOCIgZmlsbD0iIzM0MzQzNCIvPgo8cGF0aCBkPSJNMzIgMTZWMzJIMjRWMjBIMzJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMzIgNDRWMzJIMjRWMjBIMzJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMzIgNDRWMzJIMjRWMjBIMzJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K', 
+              type: 'audio' 
+            }
+          } else if (ext === '.txt') {
+            // Text files - return text icon
+            return { 
+              path: filePath, 
+              preview: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iOCIgZmlsbD0iIzM0MzQzNCIvPgo8cGF0aCBkPSJNMjAgMjBIMzRWMjRIMjBWMjBaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMjAgMjhIMzRWMzJIMjBWMjhaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMjAgMzZIMzRWMzBIMjBWMzZaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K', 
+              type: 'text' 
+            }
+          } else {
+            // Unknown file type - return generic icon
+            return { 
+              path: filePath, 
+              preview: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iOCIgZmlsbD0iIzM0MzQzNCIvPgo8cGF0aCBkPSJNMzIgMTZWMzJIMjRWMjBIMzJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K', 
+              type: 'unknown' 
+            }
+          }
+        })
+      )
+      
       previews.forEach((preview: any) => console.log(preview.path))
       return previews
     } catch (error) {
       console.error("Error getting screenshots:", error)
-      throw error
+      return { success: false, error: error.message || String(error) }
     }
   })
 
@@ -68,7 +92,7 @@ export function initializeIpcHandlers(appState: AppState): void {
       return { success: true }
     } catch (error: any) {
       console.error("Error resetting queues:", error)
-      return { success: false, error: error.message }
+      return { success: false, error: error.message || String(error) }
     }
   })
 
@@ -79,7 +103,7 @@ export function initializeIpcHandlers(appState: AppState): void {
       return result
     } catch (error: any) {
       console.error("Error in analyze-audio-base64 handler:", error)
-      throw error
+      return { success: false, error: error.message || String(error) }
     }
   })
 
@@ -90,18 +114,19 @@ export function initializeIpcHandlers(appState: AppState): void {
       return result
     } catch (error: any) {
       console.error("Error in analyze-audio-file handler:", error)
-      throw error
+      return { success: false, error: error.message || String(error) }
     }
   })
 
   // IPC handler for analyzing image from file path
   ipcMain.handle("analyze-image-file", async (event, path: string) => {
     try {
-      const result = await appState.processingHelper.getLLMHelper().analyzeImageFile(path)
+      const llmHelper = await appState.processingHelper.getLLMHelper()
+      const result = await llmHelper.analyzeImageFile(path)
       return result
     } catch (error: any) {
       console.error("Error in analyze-image-file handler:", error)
-      throw error
+      return { success: false, error: error.message || String(error) }
     }
   })
 
@@ -136,5 +161,18 @@ export function initializeIpcHandlers(appState: AppState): void {
 
   ipcMain.handle("quit-app", () => {
     app.quit()
+  })
+
+  // IPC handler for adding files to the screenshot queue
+  ipcMain.handle("add-file-to-queue", async (event, filePath: string) => {
+    try {
+      console.log("add-file-to-queue called with path:", filePath)
+      appState.addFileToQueue(filePath)
+      console.log("File added to queue successfully")
+      return { success: true }
+    } catch (error: any) {
+      console.error("Error adding file to queue:", error)
+      return { success: false, error: error.message || String(error) }
+    }
   })
 }
