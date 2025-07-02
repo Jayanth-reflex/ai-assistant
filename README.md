@@ -1,4 +1,4 @@
-# UAT AI Meetings Assistant
+# AI Meetings Assistant
 
 A sophisticated Electron-based AI interview coaching assistant that provides intelligent, structured responses for technical interview preparation. Built with React, TypeScript, and Google's Gemini LLM API.
 
