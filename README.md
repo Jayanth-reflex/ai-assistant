@@ -1,6 +1,6 @@
 # AI Meetings Assistant
 
-A sophisticated Electron-based AI interview coaching assistant that provides intelligent, structured responses for technical interview preparation. Built with React, TypeScript, and Google's Gemini LLM API.
+A sophisticated Electron-based AI meeting assistant that provides intelligent, structured responses in real-time. Built with React, TypeScript, and Google's Gemini LLM API.
 
 ## 🚀 Features
 
@@ -65,24 +65,43 @@ The system uses a world-class approach that:
 - Google Gemini API key
 
 ### Setup
-```bash
-# Clone the repository
-git clone <repository-url>
-cd UAT-ai-meetings-assistant
 
-# Install dependencies
-npm install
+Follow these steps to set up and run the project:
 
-# Set up your Gemini API key in the app settings
-# The app will guide you through this process on first launch
+1. **Clone the repository**
+   ```sh
+   git clone <repository-url>
+   cd UAT-ai-meetings-assistant
+   ```
 
-# Start development server
-npm run app:dev
+2. **Install dependencies**
+   ```sh
+   npm install
+   ```
 
-# Build for production
-npm run build
-npm run app:dist
-```
+3. **Compile Electron TypeScript code**
+   ```sh
+   npx tsc -p electron/tsconfig.json
+   ```
+   - This compiles the Electron main process code. Run this after installing dependencies and before starting or building the app.
+
+4. **Configure Gemini API Key**
+   - On first launch, the app will prompt you to enter your Gemini API key in the settings.
+   - You can also set or update the key anytime from the app's Settings page.
+
+5. **Start the development server**
+   ```sh
+   npm run app:dev
+   ```
+   - This will start both the Vite development server and the Electron app in development mode.
+
+6. **Build for production**
+   ```sh
+   npm run build
+   npm run app:build
+   ```
+   - `npm run build` compiles the frontend and backend.
+   - `npm run app:build` packages the Electron app for distribution.
 
 ## 📖 Usage
 
