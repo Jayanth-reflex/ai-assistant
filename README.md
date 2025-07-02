@@ -210,7 +210,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - **Google Gemini API** for powerful AI capabilities
-- **Electron** for cross-platform desktop application framework
+- **Electron** for a cross-platform desktop application framework
 - **React** for modern UI development
 - **Sharp** for efficient image processing
 - **Tailwind CSS** for beautiful, responsive styling
@@ -225,11 +225,9 @@ For support, questions, or feature requests:
 ## Known Issues & Important Notes
 
 ### Screenshot Input Category Classification
-- There was a recent issue where screenshot input category classification was incorrect due to a bug in line numbering logic. This affected the accuracy of problem type detection for image-based inputs. The bug has been identified and fixed. Please refer to the technical documentation for details.
+- There was a recent issue where screenshot input category classification was incorrect due to a bug in the line numbering logic. This affected the accuracy of problem type detection for image-based inputs. The bug has been identified and fixed. Please refer to the technical documentation for details.
 
 ### Environment Cleanup
 - For best results, always start with a clean environment. Temporary files, screenshots, and session data should be cleared regularly. Use the provided cleanup scripts or the in-app reset functionality (Cmd+R) to avoid stale data issues.
 
 ---
-
-**Built with ❤️ for technical interview preparation**
