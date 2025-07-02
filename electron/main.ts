@@ -1,3 +1,19 @@
+/**
+ * @file main.ts
+ * @description
+ *   Main entry point for the UAT AI Meetings Assistant Electron application. Initializes application state, window, screenshot, processing, and shortcut helpers. Registers IPC handlers and manages application lifecycle events.
+ *
+ * Architecture Role:
+ *   - Bootstraps the Electron app and all core services.
+ *   - Manages global state, window, screenshot, and processing helpers.
+ *   - Handles Electron app lifecycle, session, and IPC event registration.
+ *
+ * Usage:
+ *   Run as the Electron main process entry point. Instantiates AppState and all core helpers.
+ *
+ * @author UAT
+ * @copyright MIT
+ */
 import { app, BrowserWindow, ipcMain } from "electron"
 import { initializeIpcHandlers } from "./ipcHandlers"
 import { WindowHelper } from "./WindowHelper"

@@ -1,5 +1,5 @@
 import { BrowserWindow, screen } from "electron"
-import { AppState } from "main"
+import { AppState } from "./main"
 import path from "node:path"
 
 const isDev = process.env.NODE_ENV === "development"
@@ -8,18 +8,73 @@ const startUrl = isDev
   ? "http://localhost:5180"
   : `file://${path.join(__dirname, "../dist/index.html")}`
 
-export class WindowHelper {
-  private mainWindow: BrowserWindow | null = null
-  private isWindowVisible: boolean = false
-  private windowPosition: { x: number; y: number } | null = null
-  private windowSize: { width: number; height: number } | null = null
-  private appState: AppState
+/**
+ * @file WindowHelper.ts
+ * @description
+ *   Manages the main Electron window for the UAT AI Meetings Assistant. Handles window creation, positioning, resizing, visibility, and cross-platform optimizations for always-on-top, transparent overlays, and user experience.
+ *
+ * Architecture Role:
+ *   - Provides all window management and manipulation for the Electron app.
+ *   - Integrates with AppState for stateful window operations and event handling.
+ *   - Implements platform-specific optimizations for macOS, Linux, and Windows.
+ *
+ * Usage:
+ *   Instantiate and use public methods to create, show, hide, move, and resize the main application window.
+ *
+ * @author UAT
+ * @copyright MIT
+ */
 
-  // Initialize with explicit number type and 0 value
+export class WindowHelper {
+  /**
+   * Reference to the main Electron BrowserWindow instance.
+   * @private
+   */
+  private mainWindow: BrowserWindow | null = null
+  /**
+   * Tracks whether the window is currently visible.
+   * @private
+   */
+  private isWindowVisible: boolean = false
+  /**
+   * Last known window position.
+   * @private
+   */
+  private windowPosition: { x: number; y: number } | null = null
+  /**
+   * Last known window size.
+   * @private
+   */
+  private windowSize: { width: number; height: number } | null = null
+  /**
+   * Reference to the application state for window operations.
+   * @private
+   */
+  private appState: AppState
+  /**
+   * Cached screen width for window movement calculations.
+   * @private
+   */
   private screenWidth: number = 0
+  /**
+   * Cached screen height for window movement calculations.
+   * @private
+   */
   private screenHeight: number = 0
+  /**
+   * Step size for window movement.
+   * @private
+   */
   private step: number = 0
+  /**
+   * Current X position for window movement.
+   * @private
+   */
   private currentX: number = 0
+  /**
+   * Current Y position for window movement.
+   * @private
+   */
   private currentY: number = 0
 
   constructor(appState: AppState) {

@@ -1,4 +1,19 @@
-// ipcHandlers.ts
+/**
+ * @file ipcHandlers.ts
+ * @description
+ *   Registers and manages all IPC handlers for the UAT AI Meetings Assistant. Handles communication between the renderer and main process for screenshots, audio, image, session, and configuration management.
+ *
+ * Architecture Role:
+ *   - Centralizes all IPC handler registration for Electron main process.
+ *   - Integrates with AppState for stateful operations and event propagation.
+ *   - Handles all major app workflows via IPC (screenshots, audio, config, session, etc).
+ *
+ * Usage:
+ *   Call `initializeIpcHandlers(appState)` during app startup to register all handlers.
+ *
+ * @author UAT
+ * @copyright MIT
+ */
 
 import { ipcMain, app } from "electron"
 import { AppState } from "./main"

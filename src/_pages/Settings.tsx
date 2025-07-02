@@ -117,7 +117,31 @@ const Settings: React.FC<SettingsProps> = ({ setView }) => {
         />
       </div>
 
-      {/* Color Customization Section */}
+      {/* Model Selection Section */}
+      <div style={{ marginBottom: '15px' }}>
+        <div style={{ marginBottom: '8px', fontSize: '11px', color: '#ccc' }}>
+          AI Model
+        </div>
+        <select
+          style={{
+            width: '100%',
+            padding: '7px',
+            borderRadius: '4px',
+            border: '1px solid #555',
+            backgroundColor: '#2a2a2a',
+            color: 'white',
+            fontSize: '12px',
+            outline: 'none',
+            height: '28px',
+            boxSizing: 'border-box'
+          }}
+          value={preferences.model}
+          onChange={e => updatePreference('model', e.target.value)}
+        >
+          <option value="gemini-2.0-flash">Gemini 2.0 Flash (Fast)</option>
+          <option value="gemini-2.0-pro">Gemini 2.0 Pro (High Quality)</option>
+        </select>
+      </div>
       <div style={{ marginBottom: '15px' }}>
         <div style={{ marginBottom: '8px', fontSize: '11px', color: '#ccc' }}>
           Response Colors
