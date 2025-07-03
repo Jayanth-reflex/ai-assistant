@@ -1,5 +1,5 @@
 {
-  "name": "interview-coder",
+  "name": "ai-meetings-assistant",
   "version": "1.0.0",
   "main": "./dist-electron/main.js",
   "scripts": {
@@ -56,7 +56,7 @@
       {
         "provider": "github",
         "owner": "ibttf",
-        "repo": "interview-coder-frontend"
+        "repo": "ai-meetings-assistant"
       }
     ]
   },

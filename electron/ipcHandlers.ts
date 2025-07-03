@@ -1,7 +1,7 @@
 /**
  * @file ipcHandlers.ts
  * @description
- *   Registers and manages all IPC handlers for the UAT AI Meetings Assistant. Handles communication between the renderer and main process for screenshots, audio, image, session, and configuration management.
+ *   Registers and manages all IPC handlers for the AI Meetings Assistant. Handles communication between the renderer and main process for screenshots, audio, image, session, and configuration management.
  *
  * Architecture Role:
  *   - Centralizes all IPC handler registration for Electron main process.

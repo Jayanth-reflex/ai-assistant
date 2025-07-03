@@ -140,6 +140,8 @@ const Settings: React.FC<SettingsProps> = ({ setView }) => {
         >
           <option value="gemini-2.0-flash">Gemini 2.0 Flash (Fast)</option>
           <option value="gemini-2.0-pro">Gemini 2.0 Pro (High Quality)</option>
+          <option value="gemini-2.5-flash">Gemini 2.5 Flash (Faster, Newest)</option>
+          <option value="gemini-2.5-pro">Gemini 2.5 Pro (Highest Quality, Newest)</option>
         </select>
       </div>
       <div style={{ marginBottom: '15px' }}>

@@ -3,7 +3,7 @@ import { contextBridge, ipcRenderer } from "electron"
 /**
  * @file preload.ts
  * @description
- *   Electron preload script for the UAT AI Meetings Assistant. Exposes a secure, typed API to the renderer process for all Electron/Node operations, event subscriptions, and IPC communication.
+ *   Electron preload script for the AI Meetings Assistant. Exposes a secure, typed API to the renderer process for all Electron/Node operations, event subscriptions, and IPC communication.
  *
  * Architecture Role:
  *   - Bridges the Electron main process and renderer process securely.

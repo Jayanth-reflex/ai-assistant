@@ -11,7 +11,7 @@ const startUrl = isDev
 /**
  * @file WindowHelper.ts
  * @description
- *   Manages the main Electron window for the UAT AI Meetings Assistant. Handles window creation, positioning, resizing, visibility, and cross-platform optimizations for always-on-top, transparent overlays, and user experience.
+ *   Manages the main Electron window for the AI Meetings Assistant. Handles window creation, positioning, resizing, visibility, and cross-platform optimizations for always-on-top, transparent overlays, and user experience.
  *
  * Architecture Role:
  *   - Provides all window management and manipulation for the Electron app.

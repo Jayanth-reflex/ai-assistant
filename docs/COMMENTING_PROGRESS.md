@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document tracks the progress of adding comprehensive comments and documentation to the UAT AI Meetings Assistant codebase. The goal is to ensure all code is well-documented for maintainability and future development.
+This document tracks the progress of adding comprehensive comments and documentation to the AI Meetings Assistant codebase. The goal is to ensure all code is well-documented for maintainability and future development.
 
 ## Completed Files
 

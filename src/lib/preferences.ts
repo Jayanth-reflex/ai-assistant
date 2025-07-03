@@ -2,7 +2,7 @@ export interface UserPreferences {
   responseBackgroundColor: string
   responseFontColor: string
   responseBackgroundOpacity: number
-  model: 'gemini-2.0-flash' | 'gemini-2.0-pro'
+  model: 'gemini-2.0-flash' | 'gemini-2.0-pro' | 'gemini-2.5-flash' | 'gemini-2.5-pro'
 }
 
 const DEFAULT_PREFERENCES: UserPreferences = {

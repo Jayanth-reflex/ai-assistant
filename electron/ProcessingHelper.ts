@@ -1,7 +1,7 @@
 /**
  * @file ProcessingHelper.ts
  * @description
- *   Core orchestration engine for the UAT AI Meetings Assistant. Manages the complete processing pipeline for all input types (screenshots, audio, text, mixed), coordinates queue management, error handling, and state transitions. Implements world-class multi-image processing and robust fallback mechanisms for technical interview coaching.
+ *   Core orchestration engine for the AI Meetings Assistant. Manages the complete processing pipeline for all input types (screenshots, audio, text, mixed), coordinates queue management, error handling, and state transitions. Implements world-class multi-image processing and robust fallback mechanisms for technical interview coaching.
  *
  * Architecture Role:
  *   - Orchestrates the flow of data and processing between UI, LLM, and input sources.
@@ -198,10 +198,96 @@ export class ProcessingHelper {
         
         if (screenshots.length > 0) {
           try {
-            // Create a comprehensive prompt that treats all images as one problem
-            const combinedPrompt = `You are a FAANG senior engineer attending a technical interview. You are presented with a problem that spans multiple images/screenshots.\n\nTo provide the best possible answer, follow this two-step process internally:\nFirst, for each image provided, individually analyze its content. Note down key information, code snippets, problem statements, or diagrams.\nSecond, synthesize the information from all individual image analyses into a single, coherent understanding of the overall problem.\n\nBased on your final synthesized understanding, provide a structured response.\n\nIMPORTANT INSTRUCTIONS:\n1. Your final output should be a single, consolidated response, not a summary of each image.\n2. Extract the complete problem statement by combining information from all images.\n3. Identify the programming language if specified in any image.\n4. Categorize the problem and provide a structured response.\n5. If code is shown in the images, maintain the exact language and structure.\n6. Provide the solution in the SAME LANGUAGE as shown in the problem.\n\nRESPONSE FORMAT (follow exactly):\nCategory: [algorithm/debugging/general]\n\nProblem Analysis:\n- Key Data Structures: [Array, Hash Map, Tree, etc.]\n- Algorithm Pattern: [Two Pointers, Sliding Window, DFS/BFS, etc.]\n- Time Complexity Target: [O(n), O(log n), etc.]\n- Space Complexity Target: [O(1), O(n), etc.]\n\nOptimal Approach:\n1. [Step-by-step approach]\n2. [Edge cases to consider]\n3. [Optimization strategies]\n\nOptimised Code:\n\`\`\`[language]\n[clean, well-commented code in the same language as the problem]\n\`\`\`\n\nAdditional Context:\n${textContext ? `Text Input: ${textContext}\n` : ''}\n${audioContext ? `Audio Input: ${audioContext}\n` : ''}\n\nAnalyze all images together and provide a single, coherent response.`
+            // FAANG-level prompt for Gemini LLM: extract, categorize, and solve
+            const combinedPrompt = `You are a world-class FAANG senior engineer and technical interviewer. You are given one or more screenshots from a coding interview. Your tasks are:
 
-            // Convert all screenshots to generative parts
+1. Extract ALL text, code, and relevant information from the images. Be robust to line numbers, code formatting, and diagrams. Ignore any visual noise or irrelevant UI elements.
+2. Synthesize the extracted content into a single, clear problem statement. **Do NOT copy, paraphrase, or include the raw input, OCR, constraints, or examples in your response. The response must always start with 'Category:' and follow the provided structure.**
+3. Categorize the problem as one of: algorithm, technical, debugging_optimization, or general. Use these definitions:
+   - **algorithm:** Coding problems, DSA, competitive programming.
+   - **technical:** API, technical languages, frameworks, functions, methods, keywords, or any technical concept questions.
+   - **debugging_optimization:** Code debugging, performance issues.
+   - **general:** Non-technical, meta, or open-ended questions.
+   **If the question is about a programming API, technical languages, frameworks, functions, methods, keywords, or any technical concept questions, always classify as Technical, not General.**
+4. Provide a structured, production-quality solution in the SAME programming language as the problem. Use the response format that matches the detected category below. DO NOT mix formats. Strictly follow the format for the chosen category.
+5. If the input contains a code structure (e.g., class, main method), preserve and complete it. If not, implement a full, runnable solution with a main function or entry point as required by the language.
+6. Complexity Analysis must always include both Time and Space Complexity, with a brief justification in 1 line. If unknown, write 'N/A' and explain why in 1 line.
+
+---
+RESPONSE FORMATS (choose exactly one based on your classification):
+
+[algorithm]
+Category: Algorithm / DS
+
+**Most Efficient Approach:**
+1. **Algorithm Choice:** [Specific algorithm name and why it's optimal] (1-2 lines)
+2. **Edge Case Strategy:** [How code handles all critical edge cases] (1-2 lines)
+
+**Optimized Implementation:**
+\`\`\`[language]
+// Production-ready code with comprehensive edge case handling
+// Each line must have meaningful comments explaining the logic
+// Code must pass ALL test cases and edge cases
+// If the input code structure is present, preserve and complete it. Otherwise, implement a full, runnable solution with a main function.
+[Your flawless, optimal solution here]
+\`\`\`
+
+**Complexity Analysis:** (You MUST always include both Time Complexity and Space Complexity in the Complexity Analysis section. If you do not, your answer will be considered incomplete and rejected. Be explicit: 'Complexity Analysis:' must always have both.)
+- **Time Complexity:** [Always include, never omit. If unknown, write 'N/A' and explain why in 1 line.]
+- **Space Complexity:** [Always include, never omit. If unknown, write 'N/A' and explain why in 1 line.]
+
+**Test Case Validation:**
+- Handles: [List key edge cases covered]
+
+---
+
+[technical]
+Category: Technical
+
+**Direct Answer:**
+[Provide a clear, immediate answer to the question.]
+
+Pseudo-Code (only if applicable):
+Provide a concise, commented code example in [language] if it clarifies the explanation.
+\`\`\`[language]
+// Your sample pseudo-code here
+\`\`\`
+
+If multiple choice, start with the answer, then explain why it's correct and why the other options are incorrect.
+
+---
+
+[debugging_optimization]
+Category: Debugging / Troubleshooting
+
+**Root Cause Analysis:**
+- **Primary Issue:** [Specific root cause identification] (1-2 lines)
+
+**Comprehensive Solution:**
+\`\`\`[language]
+// Fixed code with comprehensive error handling
+// Optimized for performance and reliability
+// Comments explaining each fix and improvement
+[Your debugged and optimized solution here]
+\`\`\`
+
+**Optimization Improvements:**
+- [Performance enhancements made] (1-2 lines)
+- [Edge cases now handled] (1-2 lines)
+
+---
+
+[general]
+Category: General
+
+**Direct Answer:** [maxOutputTokens: 50 words]
+[Provide a clear, immediate answer to the question directly.]
+
+---
+
+If any section is missing, output 'N/A' for that section, but never omit a section header. If you are unsure, make a best-faith estimate and state your reasoning. Do not mix formats. Do not add or omit sections. The order of sections must be exactly as shown for the chosen category.`
+
+            // Convert all screenshots to generative parts for Gemini LLM
             const imageParts = await Promise.all(
               screenshots.map(async (imagePath) => {
                 try {
@@ -218,12 +304,29 @@ export class ProcessingHelper {
             const validImageParts = imageParts.filter(part => part !== null)
             
             if (validImageParts.length > 0) {
-              // Send all images together with the combined prompt
+              // Send all images together with the improved prompt
               const result = await llmHelper.generateContentWithTimeout([combinedPrompt, ...validImageParts])
-              combinedResult = (await result.response).text()
+              let rawResponse = (await result.response).text()
               
-              // Clean up the response to remove any unwanted sections
-              combinedResult = this.cleanResponse(combinedResult)
+              // Post-processing: Remove any echoed input/OCR before 'Category:'
+              const categoryIndex = rawResponse.indexOf('Category:')
+              if (categoryIndex > 0) {
+                rawResponse = rawResponse.slice(categoryIndex)
+              }
+              // Ensure response starts with 'Category:'
+              if (!rawResponse.startsWith('Category:')) {
+                rawResponse = 'Category: N/A\n' + rawResponse
+              }
+              // Check for main function (for Java, C++, etc.) and Complexity Analysis
+              if (/java|c\+\+|csharp|python|go|typescript|javascript/i.test(rawResponse)) {
+                if (!/main\s*\(/i.test(rawResponse)) {
+                  rawResponse += '\n\n[Note: Main function or entry point may be missing. Please ensure a complete, runnable solution is provided.]'
+                }
+              }
+              if (!/Time Complexity:/i.test(rawResponse) || !/Space Complexity:/i.test(rawResponse)) {
+                rawResponse += '\n\n[Note: Complexity Analysis section was missing or incomplete. Please ensure both Time and Space Complexity are addressed.]'
+              }
+              combinedResult = this.cleanResponse(rawResponse)
             } else {
               throw new Error('No valid images could be processed')
             }

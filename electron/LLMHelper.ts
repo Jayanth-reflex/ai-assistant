@@ -4,7 +4,7 @@ import fs from "fs"
 /**
  * @file LLMHelper.ts
  * @description
- *   Core AI processing engine for the UAT AI Meetings Assistant. Handles all interactions with the Gemini LLM API, providing unified processing for text, audio, and image inputs. Responsible for intelligent categorization, structured response generation, robust error handling, and timeout protection for API calls. This class is central to the application's AI-driven interview coaching capabilities.
+ *   Core AI processing engine for the AI Meetings Assistant. Handles all interactions with the Gemini LLM API, providing unified processing for text, audio, and image inputs. Responsible for intelligent categorization, structured response generation, robust error handling, and timeout protection for API calls. This class is central to the application's AI-driven interview coaching capabilities.
  *
  * Architecture Role:
  *   - Serves as the main interface between the application and the Gemini LLM API.
@@ -54,6 +54,7 @@ CRITICAL QUALITY REQUIREMENTS: (INTERNAL ANALYSIS PROCESS)
 - Write production-ready, clean, comment for literally each line of code on top of it.
 - Must pass all test cases
 - You MUST NEVER just summarize what's on the screen
+- Complexity Analysis must always include both Time and Space Complexity, with a brief justification in 1 line. If unknown, write 'N/A' and explain why in 1 line.
 
 INTERNAL ANALYSIS PROCESS: (INTERNAL ANALYSIS PROCESS)
 1. **Problem Deconstruction:** Analyze constraints, requirements, and expected complexity
@@ -75,12 +76,13 @@ Category: Algorithm / DS
 // Production-ready code with comprehensive edge case handling
 // Each line must have meaningful comments explaining the logic
 // Code must pass ALL test cases and edge cases
+// If the input code structure is present, preserve and complete it. Otherwise, implement a full, runnable solution with a main function.
 [Your flawless, optimal solution here]
 \`\`\`
 
-**Complexity Analysis:**
-- **Time Complexity:** O([optimal complexity]) - [brief justification in 1-2 lines]
-- **Space Complexity:** O([optimal complexity]) - [brief justification in 1-2 lines]
+**Complexity Analysis:** (You MUST always include both Time Complexity and Space Complexity in the Complexity Analysis section. If you do not, your answer will be considered incomplete and rejected. Be explicit: 'Complexity Analysis:' must always have both.)
+- **Time Complexity:** [Always include, never omit. If unknown, write 'N/A' and explain why in 1 line.]
+- **Space Complexity:** [Always include, never omit. If unknown, write 'N/A' and explain why in 1 line.]
 
 **Test Case Validation:**
 - Handles: [List key edge cases covered]
@@ -89,27 +91,18 @@ Category: Algorithm / DS
 
     technical: `You are a senior technical architect explaining complex concepts for high-stakes interviews.
 
-QUALITY STANDARDS: (INTERNAL ANALYSIS PROCESS)
-- Provide comprehensive, accurate technical explanations
-- Include practical implementation examples where relevant
-- Cover edge cases and real-world considerations
-- Demonstrate deep understanding with concrete examples
+Category: Technical
 
 **Direct Answer:**
 [Provide a clear, immediate answer to the question.]
 
 Pseudo-Code (only if applicable):
-Provide a concise, commented code example in \`[language]\` if it clarifies the explanation.
+Provide a concise, commented code example in [language] if it clarifies the explanation.
 \`\`\`[language]
 // Your sample pseudo-code here
 \`\`\`
 
-if <multiple_choice_questions>
-- Start with the answer.
-- Then explain:
-- Why it's correct
-- Why the other options are incorrect
-</multiple_choice_questions>
+If multiple choice, start with the answer, then explain why it's correct and why the other options are incorrect.
 
 Do not add any additional context, explanations, or notes outside the required sections. The order of sections must be exactly as shown above.`,
 
@@ -155,6 +148,7 @@ Do not add any additional context, explanations, or notes outside the required s
   /**
    * Initialize the LLMHelper with Gemini API configuration.
    * @param {string} apiKey - Gemini API key for authentication.
+   * @param {string} modelName - Gemini model name (supports 2.0-flash, 2.0-pro, 2.5-flash, 2.5-pro).
    */
   constructor(apiKey: string, modelName: string = 'gemini-2.0-flash') {
     console.log(`[LLMHelper] Initializing with model: ${modelName}`)

@@ -1,7 +1,7 @@
 /**
  * @file ScreenshotHelper.ts
  * @description
- *   Manages screenshot capture, storage, queueing, and image format conversion for the UAT AI Meetings Assistant. Handles both main and extra screenshot queues, JPEG optimization, and file management for multi-modal interview input processing.
+ *   Manages screenshot capture, storage, queueing, and image format conversion for the AI Meetings Assistant. Handles both main and extra screenshot queues, JPEG optimization, and file management for multi-modal interview input processing.
  *
  * Architecture Role:
  *   - Provides screenshot capture and queue management for the Electron app.

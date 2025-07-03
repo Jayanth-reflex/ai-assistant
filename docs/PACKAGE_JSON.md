@@ -10,7 +10,7 @@ This document provides detailed explanations for every section of the `package.j
 
 ```json
 {
-  "name": "interview-coder",           // Project name for npm registry
+  "name": "ai-meetings-assistant",           // Project name for npm registry
   "version": "1.0.0",                 // Semantic versioning - major.minor.patch
   "main": "./dist-electron/main.js",  // Entry point for Electron main process
 }
@@ -78,7 +78,7 @@ This document provides detailed explanations for every section of the `package.j
 ### Auto-Updater Configuration
 - **Provider**: GitHub
 - **Owner**: ibttf
-- **Repository**: interview-coder-frontend
+- **Repository**: ai-meetings-assistant
 
 ## Development Dependencies
 
