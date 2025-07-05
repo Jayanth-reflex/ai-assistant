@@ -226,8 +226,5 @@ For support, questions, or feature requests:
 
 1. **Issues**: Create an issue in the GitHub repository
 2. **Documentation**: Check the comprehensive documentation
-3. **Community**: Join our developer community discussions
 
 ---
-
-**Built with ❤️ for the technical interview community**
