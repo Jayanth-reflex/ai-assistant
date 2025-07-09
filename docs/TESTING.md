@@ -275,7 +275,7 @@ describe('Database Integration', () => {
       const saved = await loadUserPreferences()
       
       expect(saved).toEqual(preferences)
-    })
+  })
 
     it('should handle preference updates', async () => {
       const initialPrefs = { model: 'gemini-2.0-flash' }
@@ -404,7 +404,7 @@ test.describe('Complete User Workflow', () => {
 test.describe('Error Handling', () => {
   test('should handle API failures gracefully', async ({ page }) => {
     await page.goto('/')
-    
+  
     // Mock API failure
     await page.route('**/api/generate', route => {
       route.fulfill({ status: 500, body: 'Internal Server Error' })
@@ -413,7 +413,7 @@ test.describe('Error Handling', () => {
     // Attempt processing
     await page.fill('[data-testid="text-input"]', 'Test input')
     await page.click('[data-testid="process-button"]')
-    
+  
     // Verify error handling
     await expect(page.locator('[data-testid="error-message"]')).toContainText('Processing failed')
     await expect(page.locator('[data-testid="retry-button"]')).toBeVisible()
@@ -421,7 +421,7 @@ test.describe('Error Handling', () => {
 
   test('should handle network timeouts', async ({ page }) => {
     await page.goto('/')
-    
+  
     // Mock slow response
     await page.route('**/api/generate', route => {
       setTimeout(() => route.fulfill({ status: 200, body: 'Response' }), 60000)

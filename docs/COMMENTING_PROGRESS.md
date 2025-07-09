@@ -230,7 +230,7 @@ This document should be updated whenever:
 - New files are added to the codebase
 - Existing files are significantly modified
 - Documentation standards are updated
-- New commenting requirements are identified
+- New commenting requirements are identified 
 
 ## Recent Documentation Updates
 

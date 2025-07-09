@@ -26,30 +26,33 @@ const ToastViewport = React.forwardRef<
 ))
 ToastViewport.displayName = ToastPrimitive.Viewport.displayName
 
-type ToastVariant = "neutral" | "success" | "error"
+type ToastVariant = "neutral" | "success" | "error" | "custom"
 
 interface ToastProps
   extends React.ComponentPropsWithoutRef<typeof ToastPrimitive.Root> {
   variant?: ToastVariant
+  customStyle?: React.CSSProperties
 }
 
 const toastVariants: Record<ToastVariant, string> = {
   neutral: "bg-yellow-500 text-white",
   success: "bg-green-500 text-white",
-  error: "bg-red-500 text-white"
+  error: "bg-red-500 text-white",
+  custom: "" // Custom styling will be applied via customStyle prop
 }
 
 const Toast = React.forwardRef<
   React.ElementRef<typeof ToastPrimitive.Root>,
   ToastProps
->(({ className, variant = "neutral", ...props }, ref) => (
+>(({ className, variant = "neutral", customStyle, ...props }, ref) => (
   <ToastPrimitive.Root
     ref={ref}
     className={cn(
-      "group fixed top-4 left-4 z-50 w-auto max-w-sm px-4 py-2 rounded-lg shadow-lg animate-in fade-in slide-in-from-bottom",
-      toastVariants[variant],
+      "group fixed top-4 left-4 z-50 w-auto max-w-xs px-3 py-2 rounded-md shadow-lg animate-in fade-in slide-in-from-bottom text-xs",
+      variant === "custom" ? "" : toastVariants[variant],
       className
     )}
+    style={variant === "custom" ? customStyle : undefined}
     {...props}
   />
 ))
@@ -74,12 +77,12 @@ const ToastClose = React.forwardRef<
   <ToastPrimitive.Close
     ref={ref}
     className={cn(
-      "absolute top-2 right-2 text-white opacity-70 hover:opacity-100",
+      "absolute top-1 right-1 text-white opacity-70 hover:opacity-100",
       className
     )}
     {...props}
   >
-    <X className="h-4 w-4" />
+    <X className="h-3 w-3" />
   </ToastPrimitive.Close>
 ))
 ToastClose.displayName = ToastPrimitive.Close.displayName
@@ -90,7 +93,7 @@ const ToastTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitive.Title
     ref={ref}
-    className={cn("font-semibold text-sm", className)}
+    className={cn("font-semibold text-xs", className)}
     {...props}
   />
 ))

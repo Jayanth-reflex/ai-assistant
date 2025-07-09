@@ -165,7 +165,7 @@ const QueueCommands: React.FC<QueueCommandsProps> = ({
         {/* Screenshot */}
         <div className="flex items-center gap-2">
           <span className="text-[11px] leading-none truncate">
-            {screenshots.length === 0 ? "Take Screenshot" : "Screenshot"}
+            {screenshots.length === 0 ? "Screenshot" : "Screenshot"}
           </span>
           <div className="flex gap-1">
             <button className="bg-white/10 hover:bg-white/20 transition-colors rounded-md px-1.5 py-1 text-[11px] leading-none text-white/70">
@@ -207,8 +207,7 @@ const QueueCommands: React.FC<QueueCommandsProps> = ({
               </>
             ) : (
               <>
-                <span role="img" aria-label="microphone">🎤</span>
-                Record Voice
+                Voice
               </>
             )}
           </button>
@@ -219,7 +218,7 @@ const QueueCommands: React.FC<QueueCommandsProps> = ({
             type="button"
             title="Text Input"
           >
-            <span role="img" aria-label="text">📝</span> Text Input
+          Text
           </button>
           {/* Settings Button */}
           <button
@@ -228,7 +227,7 @@ const QueueCommands: React.FC<QueueCommandsProps> = ({
             type="button"
             title="Settings"
           >
-            <span role="img" aria-label="settings">⚙️</span> Settings
+            <span role="img" aria-label="settings">⚙️</span>
           </button>
         </div>
 

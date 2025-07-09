@@ -200,7 +200,7 @@ const Solutions: React.FC<SolutionsProps> = ({ setView }) => {
   const handleCopy = () => {
     if (problemInfo?.problem_statement) {
       navigator.clipboard.writeText(problemInfo.problem_statement)
-      setToastMessage({ title: "Copied!", description: "Response copied to clipboard.", variant: "neutral" })
+      setToastMessage({ title: "Copied!", description: "Response copied to clipboard.", variant: "custom" })
       setToastOpen(true)
     }
   }
@@ -220,12 +220,29 @@ const Solutions: React.FC<SolutionsProps> = ({ setView }) => {
     }
   }
 
+  // Get toast styles based on user preferences
+  const getToastStyles = () => {
+    const bgStyle = preferencesManager.getResponseBackgroundStyle()
+    const fontColor = preferencesManager.getResponseFontColor()
+    
+    return {
+      backgroundColor: bgStyle,
+      color: fontColor,
+      fontSize: '11px',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+      border: '1px solid rgba(255, 255, 255, 0.1)'
+    }
+  }
+
   return (
     <div ref={contentRef} className="relative space-y-3 px-4 py-3">
       <Toast
         open={toastOpen}
         onOpenChange={setToastOpen}
         variant={toastMessage.variant}
+        customStyle={toastMessage.variant === "custom" ? getToastStyles() : undefined}
         duration={2000}
       >
         <ToastTitle>{toastMessage.title}</ToastTitle>

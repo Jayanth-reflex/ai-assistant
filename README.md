@@ -73,13 +73,13 @@ A sophisticated Electron-based application that provides real-time, AI-driven co
 
 1. **Clone the repository**
    ```sh
-   git clone <repository-url>
+git clone <repository-url>
    cd ai-meetings-assistant
    ```
 
 2. **Install dependencies**
    ```sh
-   npm install
+npm install
    ```
 
 3. **Compile Electron TypeScript code**
@@ -93,15 +93,15 @@ A sophisticated Electron-based application that provides real-time, AI-driven co
 
 5. **Start the development server**
    ```sh
-   npm run app:dev
+npm run app:dev
    ```
    - This will start both the Vite development server and the Electron app in development mode
 
 6. **Build for production**
    ```sh
-   npm run build
+npm run build
    npm run app:build
-   ```
+```
 
 ## 📖 Usage
 
