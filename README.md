@@ -1,7 +1,5 @@
 # AI Meetings Assistant
 
-> **World-Class AI-Powered Technical Interview Coaching Platform**
-
 A sophisticated Electron-based application that provides real-time, AI-driven coaching for technical interviews. Built with cutting-edge LLM technology, advanced image processing, and production-grade architecture.
 
 ## 🚀 Features
