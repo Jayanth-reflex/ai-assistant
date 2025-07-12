@@ -129,4 +129,4 @@ For advanced and future optimization ideas, see [`docs/FUTURE_PLAN.md`](./FUTURE
 
 ## 📄 License
 
-This project is licensed under the [MIT License](../LICENSE).
+This project is licensed under the [MIT License](./LICENSE).
