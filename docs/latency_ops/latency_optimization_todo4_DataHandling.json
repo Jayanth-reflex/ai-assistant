@@ -1,0 +1,35 @@
+[
+  {
+    "todoNumber": 1,
+    "area": "Data",
+    "presentSituation": "File-based data transfer",
+    "changeNeeded": "Use in-memory buffers",
+    "why": "Reduce disk I/O and speed up data transfer.",
+    "where": "All capture/transfer code",
+    "how": "Refactor to use Buffers/Blobs; pass via IPC, shared memory, or WebSocket",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 2,
+    "area": "Data",
+    "presentSituation": "Frequent disk I/O",
+    "changeNeeded": "Minimize throughout pipeline",
+    "why": "Keep all transient data in memory unless persistence is required.",
+    "where": "All pipeline stages",
+    "how": "Audit and keep all transient data in memory unless persistence is required",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 3,
+    "area": "Data",
+    "presentSituation": "Serialization for IPC/API",
+    "changeNeeded": "Pass data in memory between components",
+    "why": "Avoid serialization overhead and speed up IPC/API.",
+    "where": "All pipeline stages",
+    "how": "Use efficient binary formats if serialization is unavoidable",
+    "implemented": "No",
+    "tested": "No"
+  }
+] 

@@ -2,6 +2,9 @@
 // Service to send prompt to Gemini API and return response
 import { ipcMain } from 'electron';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import fs from 'fs';
+import path from 'path';
+import { app } from 'electron';
 
 /**
  * GeminiClient provides static methods to send prompts to the Gemini API and receive responses.
@@ -13,11 +16,23 @@ export class GeminiClient {
    * @returns The response from Gemini as a string.
    */
   static async sendPrompt(prompt: string): Promise<string> {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) throw new Error('GEMINI_API_KEY not set in environment');
+    const configPath = path.join(app.getPath('userData'), 'config.json');
+    let apiKey = '';
+    let model = 'gemini-2.0-flash';
+    try {
+      if (fs.existsSync(configPath)) {
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+        apiKey = config.apiKey || '';
+        model = config.model || 'gemini-2.0-flash';
+      }
+    } catch (e) {
+      console.error('[GeminiClient] Error reading config:', e);
+    }
+    if (!apiKey) throw new Error('Gemini API key not set in config');
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    const result = await model.generateContent(prompt);
+    console.log('[GeminiClient] Using model:', model);
+    const modelInstance = genAI.getGenerativeModel({ model });
+    const result = await modelInstance.generateContent(prompt);
     return result.response.text();
   }
 }

@@ -59,7 +59,11 @@ interface ElectronAPI {
   addFileToQueue: (filePath: string) => Promise<{ success: boolean; error?: string }>
   version: () => string;
   ping: () => string;
+  setGeminiModel: (model: string) => Promise<void>;
+  getGeminiModel: () => Promise<string>;
 }
+
+export type { ElectronAPI }
 
 export const PROCESSING_EVENTS = {
   //global states
@@ -209,4 +213,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getGeminiApiKey: () => ipcRenderer.invoke('get-gemini-api-key'),
   setGeminiApiKey: (key: string) => ipcRenderer.invoke('set-gemini-api-key', key),
   addFileToQueue: (filePath: string) => ipcRenderer.invoke('add-file-to-queue', filePath),
+  setGeminiModel: (model: string) => ipcRenderer.invoke('set-gemini-model', model),
+  getGeminiModel: () => ipcRenderer.invoke('get-gemini-model'),
 } as ElectronAPI)

@@ -1,0 +1,24 @@
+[
+  {
+    "todoNumber": 1,
+    "area": "IPC",
+    "presentSituation": "Standard IPC, possible serialization overhead",
+    "changeNeeded": "Use zero-copy/shared memory for large data",
+    "why": "Reduce serialization overhead and speed up IPC.",
+    "where": "Electron main/renderer/backend",
+    "how": "Investigate Electron's native shared memory module",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 2,
+    "area": "IPC",
+    "presentSituation": "Request/response IPC",
+    "changeNeeded": "Use persistent streaming (WebSocket/GRPC) for high-freq.",
+    "why": "Enable high-frequency, low-latency communication.",
+    "where": "Electron main/renderer/backend",
+    "how": "Implement persistent WebSocket or gRPC streaming",
+    "implemented": "No",
+    "tested": "No"
+  }
+] 

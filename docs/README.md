@@ -2,9 +2,9 @@
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-4.x-blue.svg)](https://www.typescriptlang.org/) [![Electron](https://img.shields.io/badge/Electron-25.x-blue.svg)](https://www.electronjs.org/) [![Node.js](https://img.shields.io/badge/Node.js-18%2B-brightgreen.svg)](https://nodejs.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> **A world-class, ultra-low-latency, multimodal AI meetings assistant.**
+> **A world-class, ultra-low-latency, multimodal AI interview assistant.**
 > - Built for speed, reliability, and production-grade engineering.
-> - Designed real-time meeting intelligence.
+> - Designed for technical interviews, code review, and real-time meeting intelligence.
 
 ---
 
@@ -20,17 +20,18 @@
 
 ## Why This Project?
 
+- **FAANG-level engineering:** Robust, modular, and scalable codebase.
 - **Ultra-low latency:** Every pipeline stage is optimized for speed, with a clear roadmap for continuous improvement.
-- **Multimodal:** Handles screenshots, audio, and text for meetings.
+- **Multimodal:** Handles screenshots, audio, and text for technical interviews and meetings.
 - **Traceable engineering:** All optimizations and architectural decisions are documented and tracked.
 
 ---
 
 ## Key Features
 
-- 🖼️ **Screenshot-to-LLM:** Instantly extract and solve problems from screenshots.
+- 🖼️ **Screenshot-to-LLM:** Instantly extract and solve coding problems from screenshots.
 - 🎤 **Real-time Audio Transcription:** Stream audio, get incremental ASR and LLM feedback.
-- 💬 **Text Chat:** Fast, streaming LLM responses for  Q&A.
+- 💬 **Text Chat:** Fast, streaming LLM responses for technical Q&A.
 - ⚡ **Streaming & In-Memory Processing:** Designed to minimize disk I/O and maximize responsiveness.
 - 🛠️ **Production-Ready Electron + React + TypeScript Stack**
 - 📊 **Latency Instrumentation:** Built-in profiling, logging, and a living optimization roadmap.
@@ -127,6 +128,12 @@ For advanced and future optimization ideas, see [`docs/FUTURE_PLAN.md`](./FUTURE
 
 ---
 
+## 🤝 Contributing
+- Please read the [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
+- All optimizations and features should be clearly documented and referenced in PRs.
+
+---
+
 ## 📄 License
 
-This project is licensed under the [MIT License](../LICENSE).
+This project is licensed under the [MIT License](../LICENSE). 

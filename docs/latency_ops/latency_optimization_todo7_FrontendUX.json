@@ -1,0 +1,46 @@
+[
+  {
+    "todoNumber": 1,
+    "area": "UI",
+    "presentSituation": "UI waits for backend confirmation",
+    "changeNeeded": "Optimistic UI updates",
+    "why": "Show feedback immediately before backend confirmation for better UX.",
+    "where": "renderer/src/components/Chat/",
+    "how": "Show feedback immediately before backend confirmation",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 2,
+    "area": "UI",
+    "presentSituation": "Only final results shown",
+    "changeNeeded": "Progressive enhancement",
+    "why": "Render partial LLM/ASR results as they arrive.",
+    "where": "renderer/src/components/Chat/",
+    "how": "Render partial LLM/ASR results as they arrive",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 3,
+    "area": "Build",
+    "presentSituation": "All code loaded at once",
+    "changeNeeded": "Tree shaking/code splitting",
+    "why": "Reduce initial load time and improve dev experience.",
+    "where": "Frontend build config",
+    "how": "Configure Vite/Webpack for dynamic imports",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 4,
+    "area": "Build",
+    "presentSituation": "Slow dev iteration",
+    "changeNeeded": "Hot reload for dev",
+    "why": "Speed up development feedback loop.",
+    "where": "Frontend build config",
+    "how": "Ensure React Fast Refresh or similar is enabled",
+    "implemented": "No",
+    "tested": "No"
+  }
+] 

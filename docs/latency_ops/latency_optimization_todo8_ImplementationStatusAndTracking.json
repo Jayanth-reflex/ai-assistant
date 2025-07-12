@@ -1,0 +1,13 @@
+[
+  {
+    "todoNumber": "<number>",
+    "area": "<area>",
+    "presentSituation": "<current state>",
+    "changeNeeded": "<what needs to change>",
+    "why": "<reason for change>",
+    "where": "<codebase location>",
+    "how": "<implementation details>",
+    "implemented": "No",
+    "tested": "No"
+  }
+] 

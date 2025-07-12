@@ -82,13 +82,23 @@ export class ProcessingHelper {
     if (!this.llmHelper) {
       const configPath = path.join(require('electron').app.getPath('userData'), 'config.json')
       let apiKey = ''
-      let model = 'gemini-2.0-flash' // Default model
+      let model = 'models/gemini-2.0-flash' // Default model
       
       try {
         if (fs.existsSync(configPath)) {
           const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
           apiKey = config.apiKey || ''
-          model = config.model || 'gemini-2.0-flash'
+          const SUPPORTED_MODELS = [
+            'models/gemini-2.0-flash',
+            'models/gemini-2.5-flash',
+            'models/gemini-2.5-pro'
+          ]
+          if (config.model && SUPPORTED_MODELS.includes(config.model)) {
+            model = config.model
+          } else if (config.model) {
+            console.warn(`[ProcessingHelper] Unsupported Gemini model in config: ${config.model}. Falling back to models/gemini-2.0-flash.`)
+            model = 'models/gemini-2.0-flash'
+          }
         }
       } catch (error) {
         console.error('Error reading config file:', error)
@@ -102,6 +112,15 @@ export class ProcessingHelper {
       this.llmHelper = new LLMHelper(apiKey, model)
     }
     return this.llmHelper
+  }
+
+  /**
+   * Invalidate the LLMHelper cache.
+   * This forces the LLMHelper to be re-initialized with the latest model from config.json.
+   */
+  public invalidateLLMHelperCache(): void {
+    this.llmHelper = null
+    console.log('[ProcessingHelper] LLMHelper cache invalidated')
   }
 
   /**
@@ -303,6 +322,13 @@ If any section is missing, output 'N/A' for that section, but never omit a secti
               })
             )
             
+            // After imageParts are created, log their details
+            imageParts.forEach((part, idx) => {
+              const path = screenshots[idx]
+              const len = part && part.inlineData && part.inlineData.data ? part.inlineData.data.length : 0
+              console.log('[ProcessingHelper] Image part:', path, 'data length:', len)
+            })
+            
             // Filter out failed images
             const validImageParts = imageParts.filter(part => part !== null)
             
@@ -311,24 +337,23 @@ If any section is missing, output 'N/A' for that section, but never omit a secti
               const result = await llmHelper.generateContentWithTimeout([combinedPrompt, ...validImageParts])
               let rawResponse = (await result.response).text()
               
-              // Post-processing: Remove any echoed input/OCR before 'Category:'
-              const categoryIndex = rawResponse.indexOf('Category:')
-              if (categoryIndex > 0) {
-                rawResponse = rawResponse.slice(categoryIndex)
-              }
-              // Ensure response starts with 'Category:'
-              if (!rawResponse.startsWith('Category:')) {
-                rawResponse = 'Category: N/A\n' + rawResponse
-              }
-              // Check for main function (for Java, C++, etc.) and Complexity Analysis
-              if (/java|c\+\+|csharp|python|go|typescript|javascript/i.test(rawResponse)) {
-                if (!/main\s*\(/i.test(rawResponse)) {
-                  rawResponse += '\n\n[Note: Main function or entry point may be missing. Please ensure a complete, runnable solution is provided.]'
-                }
-              }
-              if (!/Time Complexity:/i.test(rawResponse) || !/Space Complexity:/i.test(rawResponse)) {
-                rawResponse += '\n\n[Note: Complexity Analysis section was missing or incomplete. Please ensure both Time and Space Complexity are addressed.]'
-              }
+              // === DISABLED POST-PROCESSING LOGIC ===
+              // const categoryIndex = rawResponse.indexOf('Category:')
+              // if (categoryIndex > 0) {
+              //   rawResponse = rawResponse.slice(categoryIndex)
+              // }
+              // if (!rawResponse.startsWith('Category:')) {
+              //   rawResponse = 'Category: N/A\n' + rawResponse
+              // }
+              // if (/java|c\+\+|csharp|python|go|typescript|javascript/i.test(rawResponse)) {
+              //   if (!/main\s*\(/i.test(rawResponse)) {
+              //     rawResponse += '\n\n[Note: Main function or entry point may be missing. Please ensure a complete, runnable solution is provided.]'
+              //   }
+              // }
+              // if (!/Time Complexity:/i.test(rawResponse) || !/Space Complexity:/i.test(rawResponse)) {
+              //   rawResponse += '\n\n[Note: Complexity Analysis section was missing or incomplete. Please ensure both Time and Space Complexity are addressed.]'
+              // }
+              // === END DISABLED ===
               combinedResult = this.cleanResponse(rawResponse)
             } else {
               throw new Error('No valid images could be processed')
@@ -346,8 +371,9 @@ If any section is missing, output 'N/A' for that section, but never omit a secti
             const textResult = await llmHelper.analyzeTextInput(textContext.trim())
             combinedResult = textResult.text
             
-            // Clean up the response to remove any unwanted sections
-            combinedResult = this.cleanResponse(combinedResult)
+            // === DISABLED POST-PROCESSING LOGIC ===
+            // combinedResult = this.cleanResponse(combinedResult)
+            // === END DISABLED ===
           } catch (error) {
             const errorMsg = `Failed to process text input: ${error instanceof Error ? error.message : 'Unknown error'}`
             processingErrors.push(errorMsg)
@@ -360,8 +386,9 @@ If any section is missing, output 'N/A' for that section, but never omit a secti
             const audioResult = await llmHelper.analyzeAudioFile(audioFiles[0])
             combinedResult = audioResult.text
             
-            // Clean up the response to remove any unwanted sections
-            combinedResult = this.cleanResponse(combinedResult)
+            // === DISABLED POST-PROCESSING LOGIC ===
+            // combinedResult = this.cleanResponse(combinedResult)
+            // === END DISABLED ===
           } catch (error) {
             const errorMsg = `Failed to process audio input: ${error instanceof Error ? error.message : 'Unknown error'}`
             processingErrors.push(errorMsg)

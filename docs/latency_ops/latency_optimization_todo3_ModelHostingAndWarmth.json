@@ -1,0 +1,46 @@
+[
+  {
+    "todoNumber": 1,
+    "area": "Models",
+    "presentSituation": "Models loaded on demand, cold starts possible",
+    "changeNeeded": "Preload all models at app startup",
+    "why": "Eliminate cold start latency for first request.",
+    "where": "Backend/model loader",
+    "how": "Load LLM, ASR, TTS in memory during initialization",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 2,
+    "area": "Models",
+    "presentSituation": "Models may unload between requests",
+    "changeNeeded": "Keep models in memory and 'warm'",
+    "why": "Avoid reloading models and reduce latency.",
+    "where": "Backend/model loader",
+    "how": "Implement keep-alive/ping mechanism",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 3,
+    "area": "Hardware",
+    "presentSituation": "CPU inference, possible slowdowns",
+    "changeNeeded": "Deploy on GPU-accelerated hardware",
+    "why": "Accelerate inference and reduce latency.",
+    "where": "Backend/model server",
+    "how": "Use Docker with NVIDIA runtime or similar setup",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 4,
+    "area": "Hardware",
+    "presentSituation": "No GPU monitoring/scaling",
+    "changeNeeded": "Monitor GPU utilization and scale as needed",
+    "why": "Ensure optimal resource usage and prevent slowdowns.",
+    "where": "Backend/model server",
+    "how": "Add GPU monitoring/logging; scale up hardware as needed",
+    "implemented": "No",
+    "tested": "No"
+  }
+] 

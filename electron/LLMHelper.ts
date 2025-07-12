@@ -156,17 +156,26 @@ Do not add any additional context, explanations, or notes outside the required s
    * @param {string} apiKey - Gemini API key for authentication.
    * @param {string} modelName - Gemini model name (supports 2.0-flash, 2.0-pro, 2.5-flash, 2.5-pro).
    */
-  constructor(apiKey: string, modelName: string = 'gemini-2.0-flash') {
+  constructor(apiKey: string, modelName: string = 'models/gemini-2.0-flash') {
+    const SUPPORTED_MODELS = [
+      'models/gemini-2.0-flash',
+      'models/gemini-2.5-flash',
+      'models/gemini-2.5-pro'
+    ]
+    if (!SUPPORTED_MODELS.includes(modelName)) {
+      throw new Error(`[LLMHelper] Unsupported Gemini model: ${modelName}. Supported models: ${SUPPORTED_MODELS.join(', ')}`)
+    }
     console.log(`[LLMHelper] Initializing with model: ${modelName}`)
     const genAI = new GoogleGenerativeAI(apiKey)
     // Optimize model configuration for faster responses
     this.model = genAI.getGenerativeModel({ 
       model: modelName,
       generationConfig: {
-        maxOutputTokens: 2048, // Limit response length for faster generation
-        temperature: 0.2, // Slightly lower temperature for more focused responses
-        topK: 3, // Limit token selection for faster processing
-        topP: 0.85 // Nucleus sampling for better quality/speed balance
+        // Set to Gemini API's maximum allowed output tokens (see https://ai.google.dev/gemini-api/docs/models)
+        maxOutputTokens: 65536,
+        temperature: 0.2,
+        topK: 3,
+        topP: 0.85
       }
     })
   }
@@ -175,10 +184,11 @@ Do not add any additional context, explanations, or notes outside the required s
    * Helper method to add timeout to API calls.
    * Prevents hanging requests and provides better user experience.
    * @param {string | (string | any)[]} prompt - The prompt to send to the LLM.
-   * @param {number} [timeoutMs=50000] - Timeout in milliseconds (default: 50 seconds).
+   * @param {number} [timeoutMs=100000] - Timeout in milliseconds (default: 100 seconds).
    * @returns {Promise<any>} Promise with the LLM response.
    */
-  public async generateContentWithTimeout(prompt: string | (string | any)[], timeoutMs: number = 50000) {
+  public async generateContentWithTimeout(prompt: string | (string | any)[], timeoutMs: number = 100000) {
+    console.log('[LLMHelper] Prompt sent to Gemini:', prompt)
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(() => reject(new Error('Request timeout')), timeoutMs)
     })
@@ -187,6 +197,16 @@ Do not add any additional context, explanations, or notes outside the required s
     
     try {
       const result = await Promise.race([contentPromise, timeoutPromise])
+      // === BEGIN: EXTRA DEBUG LOGGING ===
+      console.log('[LLMHelper] FULL RAW Gemini API response:', JSON.stringify(result, null, 2))
+      if (result && result.response) {
+        console.log('[LLMHelper] Gemini response object:', result.response)
+      }
+      // === END: EXTRA DEBUG LOGGING ===
+      if (result && result.response && typeof result.response.text === 'function') {
+        const text = await result.response.text()
+        console.log('[LLMHelper] LLM response text:', text)
+      }
       return result
     } catch (error) {
       console.error('API call failed or timed out:', error)
@@ -391,9 +411,9 @@ Do not add any additional context, explanations, or notes outside the required s
     if (words.length <= 100) return text
     
     // Look for category-indicative keywords in the first 100 words
-    const first100Words = words.slice(0, 100).join(' ')
+    const first100Words = words.slice(0, 500).join(' ')
     const categoryKeywords = {
-      algorithm: ['algorithm', 'array', 'sort', 'search', 'tree', 'graph', 'leetcode', 'hackerrank', 'coding', 'problem'],
+      algorithm: ['algorithm', 'array', 'sort', 'search', 'tree', 'graph', 'leetcode', 'hackerrank', 'coding', 'problem','program'],
       technical: ['api', 'framework', 'language', 'technology', 'concept', 'how', 'what', 'explain'],
       debugging_optimization: ['error', 'bug', 'debug', 'performance', 'optimization', 'fix', 'issue']
     }

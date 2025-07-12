@@ -1,0 +1,46 @@
+[
+  {
+    "todoNumber": 1,
+    "area": "UI",
+    "presentSituation": "UI waits for full backend result",
+    "changeNeeded": "Display partial/incremental results",
+    "why": "Improve perceived speed and user experience.",
+    "where": "renderer/src/components/Chat/",
+    "how": "Refactor to render partial results as soon as received",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 2,
+    "area": "UI",
+    "presentSituation": "No immediate feedback",
+    "changeNeeded": "Show 'processing...' or partial results immediately",
+    "why": "Provide instant feedback to users.",
+    "where": "renderer/src/components/Chat/",
+    "how": "Show loading indicators or partial results in local state",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 3,
+    "area": "Latency",
+    "presentSituation": "No strict latency targets",
+    "changeNeeded": "Set target latency <2s for all modalities",
+    "why": "Ensure consistent, low-latency experience.",
+    "where": "All pipeline stages",
+    "how": "Add instrumentation/timing logs; set up alerts",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 4,
+    "area": "Latency",
+    "presentSituation": "No continuous profiling",
+    "changeNeeded": "Continuously profile and monitor latency",
+    "why": "Identify and address bottlenecks proactively.",
+    "where": "All pipeline stages",
+    "how": "Use logs, APM, Chrome DevTools to identify/address bottlenecks",
+    "implemented": "No",
+    "tested": "No"
+  }
+] 

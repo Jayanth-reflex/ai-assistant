@@ -2,14 +2,12 @@ export interface UserPreferences {
   responseBackgroundColor: string
   responseFontColor: string
   responseBackgroundOpacity: number
-  model: 'gemini-2.0-flash' | 'gemini-2.0-pro' | 'gemini-2.5-flash' | 'gemini-2.5-pro'
 }
 
 const DEFAULT_PREFERENCES: UserPreferences = {
   responseBackgroundColor: '#000000',
   responseFontColor: '#e5e7eb', // gray-100
   responseBackgroundOpacity: 50,
-  model: 'gemini-2.0-flash'
 }
 
 const PREFERENCES_KEY = 'ai-interview-assistant-preferences'

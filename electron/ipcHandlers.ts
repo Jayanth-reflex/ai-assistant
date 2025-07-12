@@ -174,6 +174,41 @@ export function initializeIpcHandlers(appState: AppState): void {
     }
   })
 
+  ipcMain.handle('get-gemini-model', async () => {
+    try {
+      if (fs.existsSync(configPath)) {
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
+        return config.model || 'gemini-2.0-flash'
+      }
+      return 'gemini-2.0-flash'
+    } catch (e) {
+      console.error('[IPC] get-gemini-model error:', e)
+      return 'gemini-2.0-flash'
+    }
+  })
+
+  ipcMain.handle('set-gemini-model', async (event, model: string) => {
+    const SUPPORTED_MODELS = [
+      'models/gemini-2.0-flash',
+      'models/gemini-2.5-flash',
+      'models/gemini-2.5-pro'
+    ]
+    if (!SUPPORTED_MODELS.includes(model)) {
+      throw new Error(`[IPC] Unsupported Gemini model: ${model}. Supported models: ${SUPPORTED_MODELS.join(', ')}`)
+    }
+    let config: Record<string, any> = {}
+    if (fs.existsSync(configPath)) {
+      config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
+    }
+    config.model = model
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2))
+    if ((appState.processingHelper as any)?.invalidateLLMHelperCache) {
+      (appState.processingHelper as any).invalidateLLMHelperCache()
+      console.log('[IPC] set-gemini-model called. New model:', model)
+    }
+    return
+  })
+
   ipcMain.handle("quit-app", () => {
     app.quit()
   })

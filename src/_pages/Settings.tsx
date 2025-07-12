@@ -12,6 +12,28 @@ interface SettingsProps {
   setView: React.Dispatch<React.SetStateAction<'queue' | 'solutions' | 'debug' | 'settings'>>
 }
 
+// Add ErrorBoundary component
+class SettingsErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: any }> {
+  constructor(props: any) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, error }
+  }
+  componentDidCatch(error: any, info: any) {
+    console.error('[SettingsErrorBoundary] Error:', error, info)
+  }
+  render() {
+    if (this.state.hasError) {
+      return <div style={{ color: 'red', padding: 20 }}>
+        <b>Settings UI Error:</b> {String(this.state.error)}
+      </div>
+    }
+    return this.props.children
+  }
+}
+
 const Settings: React.FC<SettingsProps> = ({ setView }) => {
   const [apiKey, setApiKey] = useState("")
   const [status, setStatus] = useState<null | "success" | "error">(null)
@@ -24,26 +46,55 @@ const Settings: React.FC<SettingsProps> = ({ setView }) => {
   
   // Color preferences state
   const [preferences, setPreferences] = useState<UserPreferences>(preferencesManager.getPreferences())
+  const [model, setModel] = useState<string>("gemini-2.0-flash")
 
   useEffect(() => {
-    ;(window.electronAPI as any)?.getGeminiApiKey?.().then((key: string) => {
-      setApiKey(key)
-    })
+    if (window.electronAPI && typeof window.electronAPI.getGeminiApiKey === 'function') {
+      window.electronAPI.getGeminiApiKey().then((key: string) => {
+        setApiKey(key)
+      })
+    }
     
     // Debug logging for initial preferences
-    console.log('Settings initialized - Current preferences:', preferencesManager.getPreferences())
-    preferencesManager.debugPreferences()
+    // console.log('Settings initialized - Current preferences:', preferencesManager.getPreferences())
+    // preferencesManager.debugPreferences() // Removed as per edit hint
+
+    (async () => {
+      try {
+        if (window.electronAPI?.getGeminiModel) {
+          const backendModel = await window.electronAPI.getGeminiModel()
+          if (backendModel) {
+            setModel(backendModel)
+            console.log('[Settings] Loaded model from backend:', backendModel)
+          } else {
+            setModel('gemini-2.0-flash')
+            console.warn('[Settings] Backend returned empty model, using fallback')
+          }
+        } else {
+          setModel('gemini-2.0-flash')
+          console.warn('[Settings] window.electronAPI.getGeminiModel not available, using fallback')
+        }
+      } catch (err) {
+        setModel('gemini-2.0-flash')
+        console.error('[Settings] Failed to fetch model from backend:', err)
+      }
+    })()
   }, [])
 
   const handleSave = async () => {
     try {
-      await (window.electronAPI as any)?.setGeminiApiKey?.(apiKey)
+      if (window.electronAPI?.setGeminiModel) {
+        await window.electronAPI.setGeminiModel(model)
+        console.log('[Settings] Model changed to:', model)
+      } else {
+        console.warn('[Settings] window.electronAPI.setGeminiModel not available')
+      }
       // Save color preferences
       preferencesManager.updatePreferences(preferences)
       
       // Debug logging
       console.log('Settings saved - Current preferences:', preferences)
-      preferencesManager.debugPreferences()
+      // preferencesManager.debugPreferences() // Removed as per edit hint
       
       setTimeout(() => {
         setView("queue")
@@ -55,6 +106,7 @@ const Settings: React.FC<SettingsProps> = ({ setView }) => {
         variant: "error"
       })
       setToastOpen(true)
+      console.error('[Settings] Failed to save model:', error)
     }
   }
 
@@ -135,13 +187,12 @@ const Settings: React.FC<SettingsProps> = ({ setView }) => {
             height: '28px',
             boxSizing: 'border-box'
           }}
-          value={preferences.model}
-          onChange={e => updatePreference('model', e.target.value)}
+          value={model}
+          onChange={e => setModel(e.target.value)}
         >
-          <option value="gemini-2.0-flash">Gemini 2.0 Flash (Fast)</option>
-          <option value="gemini-2.0-pro">Gemini 2.0 Pro (High Quality)</option>
-          <option value="gemini-2.5-flash">Gemini 2.5 Flash (Faster, Newest)</option>
-          <option value="gemini-2.5-pro">Gemini 2.5 Pro (Highest Quality, Newest)</option>
+          <option value="models/gemini-2.0-flash">Gemini 2.0 Flash (Fast)</option>
+          <option value="models/gemini-2.5-flash">Gemini 2.5 Flash (Faster, Newest)</option>
+          <option value="models/gemini-2.5-pro">Gemini 2.5 Pro (Highest Quality, Newest)</option>
         </select>
       </div>
       <div style={{ marginBottom: '15px' }}>
@@ -305,4 +356,8 @@ const Settings: React.FC<SettingsProps> = ({ setView }) => {
   )
 }
 
-export default Settings 
+export default function SettingsWithBoundary(props: SettingsProps) {
+  return <SettingsErrorBoundary>
+    <Settings {...props} />
+  </SettingsErrorBoundary>
+} 

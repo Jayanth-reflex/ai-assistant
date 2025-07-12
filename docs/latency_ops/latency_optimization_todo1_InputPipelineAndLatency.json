@@ -1,0 +1,79 @@
+[
+  {
+    "todoNumber": 1,
+    "area": "Screenshot",
+    "presentSituation": "Screenshots saved to disk (slow)",
+    "changeNeeded": "In-memory processing (Buffers/Blobs) to avoid disk I/O",
+    "why": "Avoid disk I/O for faster screenshot handling.",
+    "where": "electron/",
+    "how": "Refactor screenshot logic to use in-memory data structures",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 2,
+    "area": "Screenshot",
+    "presentSituation": "Processed only after full capture",
+    "changeNeeded": "Stream data to model as soon as captured",
+    "why": "Reduce end-to-end latency by streaming image data.",
+    "where": "electron/, backend interface",
+    "how": "Implement streaming (WebSocket/IPC) to send image data in chunks",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 3,
+    "area": "Audio",
+    "presentSituation": "Audio recorded as full file, then processed",
+    "changeNeeded": "Stream audio in 20ms chunks for real-time feedback",
+    "why": "Enable real-time ASR and feedback.",
+    "where": "electron/services/",
+    "how": "Use MediaRecorder/Web Audio API to capture and send audio chunks",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 4,
+    "area": "Audio",
+    "presentSituation": "ASR runs on full audio after recording",
+    "changeNeeded": "Use streaming ASR for incremental transcription",
+    "why": "Reduce time to first transcript and improve UX.",
+    "where": "electron/services/, backend",
+    "how": "Integrate streaming ASR API (Deepgram, Whisper streaming)",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 5,
+    "area": "Text",
+    "presentSituation": "Text processed only after full submission",
+    "changeNeeded": "Process as soon as submitted",
+    "why": "Reduce perceived latency for text input.",
+    "where": "renderer/src/components/Chat/",
+    "how": "Refactor handler to send each submission immediately",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 6,
+    "area": "Text",
+    "presentSituation": "LLM responses shown only after full response",
+    "changeNeeded": "Support streaming text to LLM for incremental response",
+    "why": "Streaming LLM output allows the UI to display partial answers as they are generated, improving perceived speed.",
+    "where": "electron/, renderer/Chat/",
+    "how": "Use LLM APIs with streaming (OpenAI, Gemini); update backend/frontend for streamed responses.",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 7,
+    "area": "Screenshot",
+    "presentSituation": "JPEG/PNG only, larger files",
+    "changeNeeded": "Add WebP/AVIF support for better compression/speed",
+    "why": "Reduce image size and transfer time.",
+    "where": "electron/, renderer/",
+    "how": "Integrate sharp, libwebp, or avif for conversion; update backend/frontend for new formats",
+    "implemented": "No",
+    "tested": "No"
+  }
+] 

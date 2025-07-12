@@ -1,0 +1,46 @@
+[
+  {
+    "todoNumber": 1,
+    "area": "Backend",
+    "presentSituation": "Some blocking code, not fully async",
+    "changeNeeded": "Refactor to async/await/event-driven concurrency",
+    "why": "Eliminate blocking to improve throughput and responsiveness.",
+    "where": "electron/, backend",
+    "how": "Replace blocking code with async/await; use event emitters/message queues",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 2,
+    "area": "Pipeline",
+    "presentSituation": "Batch processing",
+    "changeNeeded": "Move to streaming processing",
+    "why": "Reduce latency by processing data as it arrives.",
+    "where": "Backend pipeline",
+    "how": "Audit for blocking calls; refactor to async equivalents",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 3,
+    "area": "Pipeline",
+    "presentSituation": "Blocking file I/O, subprocess, network",
+    "changeNeeded": "Eliminate blocking calls",
+    "why": "Prevent pipeline stalls and improve scalability.",
+    "where": "Backend",
+    "how": "Profile and refactor to non-blocking APIs",
+    "implemented": "No",
+    "tested": "No"
+  },
+  {
+    "todoNumber": 4,
+    "area": "Pipeline",
+    "presentSituation": "No streaming pipelines",
+    "changeNeeded": "Implement streaming for all input types",
+    "why": "Enable real-time processing and feedback.",
+    "where": "Backend",
+    "how": "Redesign to process data as it arrives",
+    "implemented": "No",
+    "tested": "No"
+  }
+] 
