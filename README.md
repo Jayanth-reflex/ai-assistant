@@ -68,14 +68,13 @@
 
 ### 2. Clone the Repository
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Jayanth-reflex/ai-meetings-assistant.git
 cd ai-meetings-assistant-UAT
 ```
 
 ### 3. Install Dependencies
 ```bash
 npm install
-cd renderer && npm install && cd ..
 ```
 
 ### 4. Build the Project
