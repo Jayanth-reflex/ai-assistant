@@ -20,7 +20,6 @@
 
 ## Why This Project?
 
-- **FAANG-level engineering:** Robust, modular, and scalable codebase.
 - **Ultra-low latency:** Every pipeline stage is optimized for speed, with a clear roadmap for continuous improvement.
 - **Multimodal:** Handles screenshots, audio, and text for meetings.
 - **Traceable engineering:** All optimizations and architectural decisions are documented and tracked.
