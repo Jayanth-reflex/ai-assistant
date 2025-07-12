@@ -4,7 +4,7 @@
 
 > **A world-class, ultra-low-latency, multimodal AI meetings assistant.**
 > - Built for speed, reliability, and production-grade engineering.
-> - Designed for technical interviews, code review, and real-time meeting intelligence.
+> - Designed real-time meeting intelligence.
 
 ---
 
