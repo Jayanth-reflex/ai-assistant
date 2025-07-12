@@ -1,6 +1,6 @@
 # AI Meeting Assistant
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-4.x-blue.svg)](https://www.typescriptlang.org/) [![Electron](https://img.shields.io/badge/Electron-25.x-blue.svg)](https://www.electronjs.org/) [![Node.js](https://img.shields.io/badge/Node.js-18%2B-brightgreen.svg)](https://nodejs.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 > **A world-class, ultra-low-latency, multimodal AI meetings assistant.**
 > - Built for speed, reliability, and production-grade engineering.
