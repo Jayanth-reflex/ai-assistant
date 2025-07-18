@@ -3,8 +3,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 > **A world-class, ultra-low-latency, multimodal AI meetings assistant.**
-> - Built for speed, reliability, and production-grade engineering.
-> - Designed real-time meeting intelligence.
+- Built for speed, reliability, and production-grade engineering.
+- Designed real-time meeting intelligence.
 
 ---
 
